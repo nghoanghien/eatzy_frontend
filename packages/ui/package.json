@@ -26,8 +26,7 @@
     "eslint": "^9.39.1",
     "typescript": "5.9.2",
     "react": "^18",
-    "react-dom": "^18",
-    "react-hook-form": "^7.53.0"
+    "react-dom": "^18"
   },
   "peerDependencies": {
     "react": "^18",
@@ -36,7 +35,6 @@
   "dependencies": {
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.460.0",
-    "clsx": "^2.1.0",
-    "@repo/lib": "workspace:*"
+    "clsx": "^2.1.0"
   }
 }

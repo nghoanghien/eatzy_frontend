@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import FloatingLabelInput from "../forms/FloatingLabelInput";
+// Lưu ý:
+// - LoginFormData chỉ dùng nội bộ để gợi ý kiểu hiển thị.
+// - Nếu schema Zod ở @repo/lib thay đổi, hãy truyền kiểu từ app (generic) hoặc cập nhật type này cho khớp.
+// - Tránh import type trực tiếp từ @repo/lib trong UI để tránh lỗi module/lockfile.
 type LoginFormData = { email: string; password: string; rememberMe?: boolean };
 import { Layers } from "../icons";
 
@@ -9,6 +13,12 @@ type Props = {
   onForgotPassword?: () => void;
   onSuccess?: () => void;
   onRegister?: () => void;
+  // Lưu ý:
+  // - form dùng any để tránh phụ thuộc type cross‑package.
+  // - Tối thiểu cần có: register, handleSubmit, watch, formState.{errors,isSubmitting}.
+  // - Ở app: truyền form trả về từ useZodForm<LoginFormData>.
+  // - Nếu cần kiểm tra kiểu chặt chẽ: thay any bằng interface tối thiểu hoặc UseFormReturn<LoginFormData>
+  //   (khi đó phải thêm type deps và đảm bảo module resolution).
   form: any;
 };
 
