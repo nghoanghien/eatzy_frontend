@@ -1,12 +1,13 @@
 'use client';
 
 import { motion, AnimatePresence } from '@repo/ui/motion';
-import HomeHeader from '@/features/home/components/HomeHeader';
 import CategoryScroller from '@/features/home/components/CategoryScroller';
 import dynamic from 'next/dynamic';
 const RestaurantSlider = dynamic(() => import('@/features/home/components/RestaurantSlider'), { ssr: false });
 import BackgroundTransition from '@/features/home/components/BackgroundTransition';
 import { useHomePage } from '@/features/home/hooks/useHomePage';
+import { useState } from 'react';
+import { List } from '@repo/ui/icons';
 
 export default function HomePage() {
   const {
@@ -16,11 +17,10 @@ export default function HomePage() {
     restaurantsInCategory,
     activeRestaurantIndex,
     backgroundImage,
-    filter,
     handleCategoryChange,
     handleRestaurantChange,
-    handleFilterChange,
   } = useHomePage();
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
@@ -30,15 +30,16 @@ export default function HomePage() {
         categoryName={activeCategory?.name || ''}
       />
 
-      {/* Header - matching reference layout */}
-      <HomeHeader
-        selectedFilter={filter}
-        onFilterChange={handleFilterChange}
-        onMenuClick={() => console.log('Menu clicked')}
-        onFavoritesClick={() => console.log('Favorites clicked')}
-        onSearchClick={() => console.log('Search clicked')}
-        onProfileClick={() => console.log('Profile clicked')}
-      />
+      <motion.button
+        layoutId="all-categories"
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={() => setShowAllCategories(true)}
+        className="fixed z-50 right-6 top-[18vh] flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
+      >
+        <List className="w-5 h-5" />
+        <span className="text-sm font-medium">All categories</span>
+      </motion.button>
 
       {/* Main Content Layout - matching reference images */}
       <main className="relative z-10 flex flex-col h-full pt-20 overflow-hidden">
@@ -82,6 +83,56 @@ export default function HomePage() {
           </AnimatePresence>
         </motion.section>
       </main>
+
+      <AnimatePresence>
+        {showAllCategories && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-40 bg-black"
+              onClick={() => setShowAllCategories(false)}
+            />
+            <motion.div
+              layoutId="all-categories"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed z-50 right-6 top-[18vh] w-[380px] max-w-[92vw] rounded-2xl bg-white/8 backdrop-blur-xl border border-white/20 overflow-hidden"
+            >
+              <div className="p-4 border-b border-white/10 flex items-center gap-2 text-white/90">
+                <List className="w-5 h-5" />
+                <span className="text-sm font-semibold">Categories</span>
+              </div>
+              <div className="max-h-[calc(100vh-22vh)] overflow-y-auto p-2">
+                <ul className="divide-y divide-white/10">
+                  {categories.map((c, idx) => (
+                    <li key={c.id}>
+                      <button
+                        className="w-full text-left px-4 py-3 text-white hover:bg-white/10 transition-colors"
+                        onClick={() => {
+                          handleCategoryChange(idx);
+                          setShowAllCategories(false);
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{c.name}</span>
+                          {idx === activeCategoryIndex && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 border border-white/20">Active</span>
+                          )}
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

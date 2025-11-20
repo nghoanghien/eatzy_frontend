@@ -1,0 +1,77 @@
+"use client";
+import { motion, AnimatePresence } from "@repo/ui/motion";
+import { History, ShoppingCart, Heart } from "@repo/ui/icons";
+import { NavItem, NavItemShimmer, ProfileShimmer } from "@repo/ui";
+import { useState, useEffect } from "react";
+
+export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setIsLoading(false), 400); return () => clearTimeout(t); }, []);
+
+  const customerItems = [
+    { id: "history", icon: History, text: "Lịch sử đơn hàng" },
+    { id: "current", icon: ShoppingCart, text: "Đơn hiện tại" },
+    { id: "favorites", icon: Heart, text: "Yêu thích" },
+  ];
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1.0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[60] bg-black/30 backdrop-blur-md"
+            onClick={onClose}
+          />
+          <motion.div
+            layoutId="menu-overlay"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+            className="fixed z-[70] left-6 top-20 w-[260px] max-w-[92vw] rounded-3xl bg-white/8 backdrop-blur-xl border border-white/20 overflow-hidden"
+          >
+
+            {isLoading ? (
+              <ProfileShimmer expanded={true} />
+            ) : (
+              <div className="relative flex items-center p-6 border-b border-white/10 text-white/90">
+                <div className="relative h-12 w-12 rounded-2xl flex items-center justify-center shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.2)] bg-white/10 border border-white/20">
+                  <div className="w-5 h-5 rounded-md bg-white/40" />
+                </div>
+                <div className="ml-4">
+                  <p className="font-semibold text-sm">Người dùng</p>
+                  <p className="text-xs text-white/80">user@example.com</p>
+                </div>
+              </div>
+            )}
+
+            <div className="relative flex-1 py-4 px-3 flex flex-col overflow-hidden">
+              <div className="mb-3 px-4">
+                <p className="text-xs text-white/70 uppercase font-medium">Dành cho khách hàng</p>
+              </div>
+              {isLoading ? (
+                customerItems.map((_, idx) => <NavItemShimmer key={idx} expanded={true} index={idx} />)
+              ) : (
+                customerItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavItem
+                      key={item.id}
+                      icon={<Icon size={20} className="text-white" />} text={item.text}
+                      expanded={true}
+                      active={false}
+                    />
+                  );
+                })
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}

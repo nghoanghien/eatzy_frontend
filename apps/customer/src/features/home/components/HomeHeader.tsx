@@ -1,25 +1,22 @@
 'use client';
 
 import { motion } from '@repo/ui/motion';
-import { Menu, BookHeart, Search, User } from '@repo/ui/icons';
+import { Menu, BookHeart, Search, ShoppingCart } from '@repo/ui/icons';
+import { useCartStore } from '@repo/store';
 // import { useState } from 'react';
 
 interface HomeHeaderProps {
   onMenuClick?: () => void;
   onFavoritesClick?: () => void;
   onSearchClick?: () => void;
-  onProfileClick?: () => void;
-  selectedFilter?: string;
-  onFilterChange?: (filter: string) => void;
+  onCartClick?: () => void;
 }
 
 export default function HomeHeader({
   onMenuClick,
   onFavoritesClick,
   onSearchClick,
-  onProfileClick,
-  selectedFilter = 'All recipes',
-  onFilterChange,
+  onCartClick,
 }: HomeHeaderProps) {
   // const [layoutView, setLayoutView] = useState<'grid' | 'list'>('grid');
 
@@ -31,6 +28,7 @@ export default function HomeHeader({
           {/* Logo and Menu */}
           <div className="flex items-center gap-4">
             <motion.button
+              layoutId="menu-overlay"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onMenuClick}
@@ -75,7 +73,7 @@ export default function HomeHeader({
             className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
           >
             <BookHeart className="w-5 h-5 text-white" />
-            <span className="text-white text-sm font-medium">MY COOKBOOK</span>
+            <span className="text-white text-sm font-medium">Đơn hàng hiện tại</span>
           </motion.button>
 
           {/* Search */}
@@ -88,38 +86,30 @@ export default function HomeHeader({
             <Search className="w-5 h-5 text-white" />
           </motion.button>
 
-          {/* Profile */}
           <motion.button
+            layoutId="cart"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={onProfileClick}
-            className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors overflow-hidden"
+            onClick={onCartClick}
+            className="relative w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
           >
-            <User className="w-5 h-5 text-white" />
+            <ShoppingCart className="w-5 h-5 text-white" />
+            {/** Cart count badge */}
+            <CartCountBadge />
           </motion.button>
-
-          {/* Filter Dropdown */}
-          <div className="relative">
-            <motion.select
-              whileHover={{ scale: 1.02 }}
-              value={selectedFilter}
-              onChange={(e) => onFilterChange?.(e.target.value)}
-              className="appearance-none px-4 py-2 pr-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
-            >
-              <option value="All recipes" className="bg-gray-900">All recipes</option>
-              <option value="My favorites" className="bg-gray-900">My favorites</option>
-              <option value="Recent" className="bg-gray-900">Recent</option>
-              <option value="Popular" className="bg-gray-900">Popular</option>
-            </motion.select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
         </motion.div>
       </div>
     </header>
+  );
+}
+
+function CartCountBadge() {
+  const count = useCartStore((s) => s.items.length);
+  if (count === 0) return null;
+  return (
+    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--primary)] text-[10px] leading-[18px] text-black font-bold border border-white/60 flex items-center justify-center">
+      {count}
+    </span>
   );
 }
 

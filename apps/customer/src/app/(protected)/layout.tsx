@@ -1,3 +1,23 @@
+"use client";
+import { useState } from "react";
+import HomeHeader from "@/features/home/components/HomeHeader";
+import CartOverlay from "@/features/cart/components/CartOverlay";
+import ProtectedMenuOverlay from "@/features/navigation/components/ProtectedMenuOverlay";
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  const [cartOpen, setCartOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  return (
+    <div className="relative min-h-screen w-full overflow-hidden">
+      <HomeHeader
+        onMenuClick={() => setMenuOpen(true)}
+        onFavoritesClick={() => {}}
+        onSearchClick={() => {}}
+        onCartClick={() => setCartOpen(true)}
+      />
+      <CartOverlay open={cartOpen} onClose={() => setCartOpen(false)} />
+      <ProtectedMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+      {children}
+    </div>
+  );
 }

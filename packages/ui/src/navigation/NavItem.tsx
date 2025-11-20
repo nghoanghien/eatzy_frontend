@@ -22,7 +22,7 @@ function NavItem({ icon, text, expanded = false, active = false, onClick, classN
     >
       <div className={`${expanded ? "" : "mx-auto"}`}>{icon}</div>
       {expanded && (
-        <span className="ml-3 text-sm font-semibold text-gray-600 whitespace-nowrap overflow-hidden">{text}</span>
+        <span className="ml-3 text-sm font-semibold text-white/80 whitespace-nowrap overflow-hidden">{text}</span>
       )}
     </div>
   );
