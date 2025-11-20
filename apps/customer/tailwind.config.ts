@@ -4,11 +4,20 @@ const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/features/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "../../packages/ui/src/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+        anton: ["var(--font-anton)"],
+        bebas: ["var(--font-bebas)"],
+        oswald: ["var(--font-oswald)"],
+        pathway: ["var(--font-pathway)"],
+        fjalla: ["var(--font-fjalla)"],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

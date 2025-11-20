@@ -72,9 +72,15 @@ importers:
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@repo/fonts':
+        specifier: workspace:*
+        version: link:../../packages/fonts
       '@repo/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@repo/models':
+        specifier: workspace:*
+        version: link:../../packages/models
       '@repo/store':
         specifier: workspace:*
         version: link:../../packages/store
@@ -270,6 +276,18 @@ importers:
       typescript-eslint:
         specifier: ^8.46.3
         version: 8.46.3(eslint@9.39.1(jiti@1.21.7))(typescript@5.9.2)
+
+  packages/fonts:
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      next:
+        specifier: 14.2.33
+        version: 14.2.33(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
 
   packages/hooks: {}
 

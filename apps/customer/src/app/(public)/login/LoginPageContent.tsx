@@ -63,7 +63,7 @@ export default function LoginPageContent() {
                 <LoginForm
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
-                  onSuccess={() => router.push("/booking")}
+                  onSuccess={() => router.push("/home")}
                   onRegister={handleRegisterClick}
                 />
               </div>

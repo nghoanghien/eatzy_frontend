@@ -1,0 +1,21 @@
+{
+  "name": "@repo/fonts",
+  "version": "0.0.0",
+  "private": true,
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./antonio": "./src/antonio.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "next": "14.2.33",
+    "typescript": "5.9.2",
+    "@repo/typescript-config": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": ">=13"
+  }
+}
