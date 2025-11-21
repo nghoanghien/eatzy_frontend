@@ -27,13 +27,20 @@ export default function HomePage() {
       {/* Animated Food Background - changes per category */}
       <BackgroundTransition
         imageUrl={backgroundImage}
-        categoryName={activeCategory?.name || ''}
+        categoryName={activeCategory?.name || ""}
       />
 
       <motion.button
         layoutId="all-categories"
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
+        transition={{
+          layout: {
+            type: "spring",
+            damping: 16,
+            stiffness: 100,
+          },
+        }}
         onClick={() => setShowAllCategories(true)}
         className="fixed z-50 right-6 top-[18vh] flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
       >
@@ -49,7 +56,7 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.7 }}
           className="flex items-center justify-center"
-          style={{ height: '42vh' }}
+          style={{ height: "42vh" }}
         >
           <CategoryScroller
             categories={categories}
@@ -100,7 +107,12 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{
+                duration: 0.2,
+                type: "spring",
+                stiffness: 150,
+                damping: 18,
+              }}
               className="fixed z-50 right-6 top-[18vh] w-[380px] max-w-[92vw] rounded-2xl bg-white/8 backdrop-blur-xl border border-white/20 overflow-hidden"
             >
               <div className="p-4 border-b border-white/10 flex items-center gap-2 text-white/90">
@@ -121,7 +133,9 @@ export default function HomePage() {
                         <div className="flex items-center justify-between">
                           <span className="font-medium">{c.name}</span>
                           {idx === activeCategoryIndex && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 border border-white/20">Active</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 border border-white/20">
+                              Active
+                            </span>
                           )}
                         </div>
                       </button>

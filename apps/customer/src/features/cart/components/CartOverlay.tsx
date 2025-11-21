@@ -30,12 +30,15 @@ export default function CartOverlay({ open, onClose }: { open: boolean; onClose:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
             className="fixed z-[70] right-6 top-20 w-[420px] max-w-[92vw] rounded-2xl bg-white/5 backdrop-blur-md border border-white/20 overflow-hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-white/10 text-white">
               <div className="font-semibold">Giỏ hàng</div>
-              <button onClick={onClose} className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -49,14 +52,24 @@ export default function CartOverlay({ open, onClose }: { open: boolean; onClose:
                       <div className="flex items-center gap-3">
                         <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 border border-white/20 flex items-center justify-center">
                           {it.imageUrl ? (
-                            <img src={it.imageUrl} alt={it.name} className="w-full h-full object-cover" />
+                            <img
+                              src={it.imageUrl}
+                              alt={it.name}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
-                            <div className="text-white/60 text-xs">No image</div>
+                            <div className="text-white/60 text-xs">
+                              No image
+                            </div>
                           )}
                         </div>
                         <div className="flex-1">
-                          <div className="text-white font-medium">{it.name}</div>
-                          <div className="text-white/80 text-sm">{(it.price * it.quantity).toLocaleString("vi-VN")} đ</div>
+                          <div className="text-white font-medium">
+                            {it.name}
+                          </div>
+                          <div className="text-white/80 text-sm">
+                            {(it.price * it.quantity).toLocaleString("vi-VN")} đ
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <button
@@ -67,11 +80,25 @@ export default function CartOverlay({ open, onClose }: { open: boolean; onClose:
                           </button>
                           <input
                             value={it.quantity}
-                            onChange={(e) => setQuantity(it.id, Math.max(1, parseInt(e.target.value || "1", 10)))}
+                            onChange={(e) =>
+                              setQuantity(
+                                it.id,
+                                Math.max(1, parseInt(e.target.value || "1", 10))
+                              )
+                            }
                             className="w-10 h-8 rounded-lg bg-white/5 border border-white/20 text-center text-white"
                           />
                           <button
-                            onClick={() => addItem({ id: it.id, name: it.name, price: it.price, imageUrl: it.imageUrl, restaurantId: it.restaurantId, quantity: 1 })}
+                            onClick={() =>
+                              addItem({
+                                id: it.id,
+                                name: it.name,
+                                price: it.price,
+                                imageUrl: it.imageUrl,
+                                restaurantId: it.restaurantId,
+                                quantity: 1,
+                              })
+                            }
                             className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white"
                           >
                             <Plus className="w-4 h-4" />
@@ -85,7 +112,9 @@ export default function CartOverlay({ open, onClose }: { open: boolean; onClose:
             </div>
             <div className="p-4 border-t border-white/10 flex items-center justify-between text-white">
               <div className="text-sm">Tổng</div>
-              <div className="text-lg font-semibold">{total().toLocaleString("vi-VN")} đ</div>
+              <div className="text-lg font-semibold">
+                {total().toLocaleString("vi-VN")} đ
+              </div>
             </div>
           </motion.div>
         </>
