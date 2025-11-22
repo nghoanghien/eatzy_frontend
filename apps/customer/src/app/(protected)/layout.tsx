@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import HomeHeader from "@/features/home/components/HomeHeader";
 import CartOverlay from "@/features/cart/components/CartOverlay";
 import ProtectedMenuOverlay from "@/features/navigation/components/ProtectedMenuOverlay";
@@ -15,9 +15,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
   const { isSearching, performSearch } = useSearch();
   const isSearchMode = searchParams.has("q");
+  const isRestaurantDetail = pathname?.startsWith("/restaurants/") ?? false;
   const isSearchBarCompact = !isHeaderVisible && isSearchMode;
 
   // Listen to scroll visibility events from SearchResults
@@ -65,7 +67,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onFavoritesClick={() => {}}
               onSearchClick={() => setSearchOpen(true)}
               onCartClick={() => setCartOpen(true)}
-              hideSearchIcon={isSearchMode}
+              hideSearchIcon={isSearchMode || isRestaurantDetail}
               onLogoClick={() => {
                 const next = new URLSearchParams(searchParams.toString());
                 next.delete('q');

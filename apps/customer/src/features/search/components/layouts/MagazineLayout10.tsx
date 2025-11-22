@@ -1,11 +1,17 @@
 import { motion } from '@repo/ui/motion';
 import type { Restaurant, Dish, MenuCategory } from '@repo/types';
 import Image from 'next/image';
-import { useHoverHighlight, HoverHighlightOverlay } from '@repo/ui';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function MagazineLayout10({ restaurant, dishes }: { restaurant: Restaurant; dishes: Dish[]; menuCategories: MenuCategory[]; }) {
   const top = dishes.slice(0, 4);
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
+  const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
+  const { show } = useLoading();
+  const router = useRouter();
+  const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
   return (
     <motion.section className="mb-16">
       <div className="relative h-[420px] overflow-hidden">
@@ -15,10 +21,16 @@ export default function MagazineLayout10({ restaurant, dishes }: { restaurant: R
           <p className="mt-3 text-[#555]">{restaurant.description}</p>
         </div>
       </div>
-      <div ref={containerRef} onMouseLeave={clearHover} className="relative grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
+      <div
+        ref={setRefs}
+        onMouseLeave={clearHover}
+        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết quán'); router.push(`/restaurants/${restaurant.slug}`); }, 300); }}
+        className="relative grid grid-cols-2 md:grid-cols-4 gap-6 mt-6 cursor-pointer"
+      >
         <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+        <TapRippleOverlay ripple={ripple} />
         {top.map((d) => (
-          <div key={d.id} onMouseEnter={(e) => moveHighlight(e, { borderRadius: 12, backgroundColor: '#ffffff', opacity: 1, scaleEnabled: true, scale: 1.12 })} className="group bg-white hover:shadow-lg transition-shadow relative z-10 cursor-pointer">
+          <div key={d.id} onMouseEnter={(e) => moveHighlight(e, { borderRadius: 12, backgroundColor: '#f5efe6', opacity: 1, scaleEnabled: true, scale: 1.12 })} className="group bg-white hover:shadow-lg transition-shadow relative z-10 cursor-pointer">
             <div className="relative aspect-[4/3] overflow-hidden">
               <Image src={d.imageUrl} alt={d.name} fill className="object-cover" />
             </div>

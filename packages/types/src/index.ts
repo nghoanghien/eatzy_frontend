@@ -9,6 +9,7 @@ export type RestaurantCategory = {
 export type Restaurant = {
   id: string;
   name: string;
+  slug?: string;
   categories: RestaurantCategory[];
   status: RestaurantStatus;
   rating?: number;
@@ -38,6 +39,17 @@ export type Dish = {
   availableQuantity: number;
   isAvailable?: boolean;
   rating?: number;
+};
+
+export type Voucher = {
+  id: string;
+  restaurantId: string;
+  title: string;
+  description?: string;
+  discountPercent?: number;
+  discountAmount?: number;
+  expiresAt?: string;
+  isAvailable?: boolean;
 };
 
 export {};

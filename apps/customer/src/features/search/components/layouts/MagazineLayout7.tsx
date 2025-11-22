@@ -1,11 +1,17 @@
 import { motion } from '@repo/ui/motion';
 import type { Restaurant, Dish, MenuCategory } from '@repo/types';
 import Image from 'next/image';
-import { useHoverHighlight, HoverHighlightOverlay } from '@repo/ui';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function MagazineLayout7({ restaurant, dishes }: { restaurant: Restaurant; dishes: Dish[]; menuCategories: MenuCategory[]; }) {
   const cols = dishes.slice(0, 3);
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
+  const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
+  const { show } = useLoading();
+  const router = useRouter();
+  const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
   
   return (
     <motion.section 
@@ -28,8 +34,14 @@ export default function MagazineLayout7({ restaurant, dishes }: { restaurant: Re
         {restaurant.description}
       </p>
 
-      <div ref={containerRef} onMouseLeave={clearHover} className="relative grid grid-cols-1 md:grid-cols-3 gap-0">
+      <div
+        ref={setRefs}
+        onMouseLeave={clearHover}
+        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết quán'); router.push(`/restaurants/${restaurant.slug}`); }, 300); }}
+        className="relative grid grid-cols-1 md:grid-cols-3 gap-0 cursor-pointer"
+      >
         <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+        <TapRippleOverlay ripple={ripple} />
         {cols.map((dish, index) => (
           <motion.div
             key={dish.id}

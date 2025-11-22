@@ -1,11 +1,17 @@
 import { motion } from '@repo/ui/motion';
 import type { Restaurant, Dish, MenuCategory } from '@repo/types';
 import Image from 'next/image';
-import { useHoverHighlight, HoverHighlightOverlay } from '@repo/ui';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function MagazineLayout6({ restaurant, dishes }: { restaurant: Restaurant; dishes: Dish[]; menuCategories: MenuCategory[]; }) {
   const items = dishes.slice(0, 10);
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
+  const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
+  const { show } = useLoading();
+  const router = useRouter();
+  const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
   
   return (
     <motion.section 
@@ -14,8 +20,14 @@ export default function MagazineLayout6({ restaurant, dishes }: { restaurant: Re
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div ref={containerRef} onMouseLeave={clearHover} className="relative flex min-h-[800px]">
+      <div
+        ref={setRefs}
+        onMouseLeave={clearHover}
+        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết quán'); router.push(`/restaurants/${restaurant.slug}`); }, 300); }}
+        className="relative flex min-h-[800px] cursor-pointer"
+      >
         <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+        <TapRippleOverlay ripple={ripple} />
         <div onMouseEnter={(e) => moveHighlight(e, { borderRadius: 10, backgroundColor: '#f0eadf', opacity: 1 })} className="w-[140px] bg-white border-r border-gray-300 flex items-start justify-center pt-8 relative z-10 cursor-pointer">
           <h1 
             className="text-[68px] font-bold text-[#3C3C3C] leading-none"

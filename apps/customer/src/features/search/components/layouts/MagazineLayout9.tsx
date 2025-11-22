@@ -1,13 +1,19 @@
 import { motion } from '@repo/ui/motion';
 import type { Restaurant, Dish, MenuCategory } from '@repo/types';
 import Image from 'next/image';
-import { useHoverHighlight, HoverHighlightOverlay } from '@repo/ui';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function MagazineLayout9({ restaurant, dishes, menuCategories }: { restaurant: Restaurant; dishes: Dish[]; menuCategories: MenuCategory[]; }) {
   const lead = dishes[0];
   const others = dishes.slice(1, 4);
   const catMap = Object.fromEntries((menuCategories || []).map((c) => [c.id, c.name]));
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
+  const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
+  const { show } = useLoading();
+  const router = useRouter();
+  const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
   
   return (
     <motion.section 
@@ -17,8 +23,14 @@ export default function MagazineLayout9({ restaurant, dishes, menuCategories }: 
       transition={{ duration: 0.5 }}
       style={{ height: '700px' }}
     >
-      <div ref={containerRef} onMouseLeave={clearHover} className="absolute inset-0">
+      <div
+        ref={setRefs}
+        onMouseLeave={clearHover}
+        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết quán'); router.push(`/restaurants/${restaurant.slug}`); }, 300); }}
+        className="absolute inset-0 cursor-pointer"
+      >
         <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+        <TapRippleOverlay ripple={ripple} />
       </div>
       <div className="absolute inset-0" style={{ clipPath: 'polygon(22% 0, 100% 0, 100% 100%, 0 100%)' }}>
         <Image

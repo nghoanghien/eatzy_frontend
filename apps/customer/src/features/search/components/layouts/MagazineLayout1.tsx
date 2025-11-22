@@ -1,8 +1,10 @@
 import { motion } from '@repo/ui/motion';
 import type { Restaurant, Dish, MenuCategory } from '@repo/types';
 import { Star } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay } from '@repo/ui';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 interface Props {
   restaurant: Restaurant;
@@ -15,6 +17,10 @@ export default function MagazineLayout1({ restaurant, dishes }: Props) {
   const featured = dishes[0];
   const sideDishes = dishes.slice(1, 5);
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
+  const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
+  const { show } = useLoading();
+  const router = useRouter();
+  const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
   
   return (
     <motion.article
@@ -47,8 +53,14 @@ export default function MagazineLayout1({ restaurant, dishes }: Props) {
           </div>
         </div>
 
-        <div ref={containerRef} onMouseLeave={clearHover} className="relative grid grid-cols-12 gap-8">
+        <div
+          ref={setRefs}
+          onMouseLeave={clearHover}
+          onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết quán'); router.push(`/restaurants/${restaurant.slug}`); }, 300); }}
+          className="relative grid grid-cols-12 gap-8 cursor-pointer"
+        >
           <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+          <TapRippleOverlay ripple={ripple} />
           {/* Large featured dish */}
           <div onMouseEnter={(e) => moveHighlight(e, { borderRadius: 12, backgroundColor: '#f5efe6', opacity: 1, scaleEnabled: true, scale: 1.12 })} className="col-span-8 relative z-10 cursor-pointer">
             <div className="relative aspect-[4/3] overflow-hidden mb-4">

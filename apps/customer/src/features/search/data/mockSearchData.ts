@@ -1,10 +1,11 @@
-import type { Restaurant, Dish, MenuCategory } from '@repo/types';
+import type { Restaurant, Dish, MenuCategory, Voucher } from '@repo/types';
 
 // Mock restaurants for search
 export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-1',
     name: 'Phở Hà Nội',
+    slug: 'pho-ha-noi-rest-1',
     categories: [{ id: 'cat-vietnamese', name: 'Vietnamese', slug: 'vietnamese' }],
     status: 'ACTIVE',
     rating: 4.8,
@@ -15,6 +16,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-2',
     name: 'Sushi Sakura',
+    slug: 'sushi-sakura-rest-2',
     categories: [{ id: 'cat-japanese', name: 'Japanese', slug: 'japanese' }],
     status: 'ACTIVE',
     rating: 4.9,
@@ -25,6 +27,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-3',
     name: 'Pizza Bella Italia',
+    slug: 'pizza-bella-italia-rest-3',
     categories: [{ id: 'cat-italian', name: 'Italian', slug: 'italian' }],
     status: 'ACTIVE',
     rating: 4.7,
@@ -35,6 +38,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-4',
     name: 'Bún Bò Huế Authentic',
+    slug: 'bun-bo-hue-authentic-rest-4',
     categories: [{ id: 'cat-vietnamese', name: 'Vietnamese', slug: 'vietnamese' }],
     status: 'ACTIVE',
     rating: 4.6,
@@ -45,6 +49,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-5',
     name: 'Café De Paris',
+    slug: 'cafe-de-paris-rest-5',
     categories: [{ id: 'cat-cafe', name: 'Café', slug: 'cafe' }],
     status: 'ACTIVE',
     rating: 4.5,
@@ -55,6 +60,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-6',
     name: 'Korean BBQ House',
+    slug: 'korean-bbq-house-rest-6',
     categories: [{ id: 'cat-korean', name: 'Korean', slug: 'korean' }],
     status: 'ACTIVE',
     rating: 4.8,
@@ -65,6 +71,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-7',
     name: 'Thai Spice Kitchen',
+    slug: 'thai-spice-kitchen-rest-7',
     categories: [{ id: 'cat-thai', name: 'Thai', slug: 'thai' }],
     status: 'ACTIVE',
     rating: 4.7,
@@ -75,6 +82,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-8',
     name: 'Burger Brothers',
+    slug: 'burger-brothers-rest-8',
     categories: [{ id: 'cat-burger', name: 'Burger', slug: 'burger' }],
     status: 'ACTIVE',
     rating: 4.6,
@@ -85,6 +93,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-9',
     name: 'Dim Sum Palace',
+    slug: 'dim-sum-palace-rest-9',
     categories: [{ id: 'cat-chinese', name: 'Chinese', slug: 'chinese' }],
     status: 'ACTIVE',
     rating: 4.9,
@@ -95,6 +104,7 @@ export const mockSearchRestaurants: Restaurant[] = [
   {
     id: 'rest-10',
     name: 'Mediterranean Delight',
+    slug: 'mediterranean-delight-rest-10',
     categories: [{ id: 'cat-mediterranean', name: 'Mediterranean', slug: 'mediterranean' }],
     status: 'ACTIVE',
     rating: 4.7,
@@ -102,6 +112,19 @@ export const mockSearchRestaurants: Restaurant[] = [
     imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800',
     description: 'Fresh Mediterranean cuisine with healthy options and vibrant flavors',
   },
+];
+
+export const mockVouchers: Voucher[] = [
+  { id: 'vou-1', restaurantId: 'rest-1', title: 'Giảm 20% hóa đơn', description: 'Áp dụng cho hóa đơn từ 200K', discountPercent: 20, expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-2', restaurantId: 'rest-2', title: 'Tặng 1 phần sashimi', description: 'Cho đơn từ 500K', discountAmount: 50000, expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-3', restaurantId: 'rest-3', title: 'Combo pizza 2 chiếc', description: 'Giảm 15%', discountPercent: 15, expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-4', restaurantId: 'rest-4', title: 'Giảm 10% món nước', discountPercent: 10, expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-5', restaurantId: 'rest-5', title: 'Mua 2 tặng 1 pastry', expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-6', restaurantId: 'rest-6', title: 'BBQ nướng 4 tặng 1', expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-7', restaurantId: 'rest-7', title: 'Giảm 25% set curry', discountPercent: 25, expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-8', restaurantId: 'rest-8', title: 'Giảm 30% burger thứ 2', discountPercent: 30, expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-9', restaurantId: 'rest-9', title: 'Combo dimsum 199K', discountAmount: 199000, expiresAt: '2025-12-31', isAvailable: true },
+  { id: 'vou-10', restaurantId: 'rest-10', title: 'Giảm 50K món chính', discountAmount: 50000, expiresAt: '2025-12-31', isAvailable: true },
 ];
 
 // Menu categories for each restaurant
@@ -322,4 +345,13 @@ export function searchRestaurants(query: string): Restaurant[] {
     return false;
   });
 }
+
+export function getRestaurantBySlug(slug: string): Restaurant | undefined {
+  return mockSearchRestaurants.find(r => r.slug === slug);
+}
+
+export function getVouchersForRestaurant(restaurantId: string): Voucher[] {
+  return mockVouchers.filter(v => v.restaurantId === restaurantId && v.isAvailable !== false);
+}
+
 

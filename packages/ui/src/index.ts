@@ -36,3 +36,4 @@ export { SkeletonGroup, SkeletonText, SkeletonCard, SkeletonAvatar, SkeletonButt
 export { default as ModernHeader } from "./headers/ModernHeader";
 export { default as ModalHeader } from "./headers/ModalHeader";
 export * from "./effects/HoverHighlight";
+export * from "./effects/TapRipple";
