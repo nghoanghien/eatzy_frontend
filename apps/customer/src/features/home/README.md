@@ -257,3 +257,4 @@ The `useHomePage` hook provides:
 - Authentication is handled at the route level via `(protected)` group
 - Login redirect automatically navigates to `/home` after success
 
+

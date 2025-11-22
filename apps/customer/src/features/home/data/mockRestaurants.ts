@@ -588,3 +588,4 @@ export const getCategoryBackgroundImage = (categorySlug: string): string => {
   return backgrounds[categorySlug] || backgrounds['fish-seafood'];
 };
 
+

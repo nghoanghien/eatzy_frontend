@@ -18,4 +18,26 @@ export type Restaurant = {
   category?: RestaurantCategory | string;
 };
 
+// Menu category created by restaurant to organize dishes
+export type MenuCategory = {
+  id: string;
+  name: string;
+  restaurantId: string;
+  displayOrder?: number;
+};
+
+// Individual dish/food item
+export type Dish = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  restaurantId: string;
+  menuCategoryId: string;
+  availableQuantity: number;
+  isAvailable?: boolean;
+  rating?: number;
+};
+
 export {};

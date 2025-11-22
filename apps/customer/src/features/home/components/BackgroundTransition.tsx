@@ -6,10 +6,12 @@ import { useEffect, useRef, useState } from 'react';
 interface BackgroundTransitionProps {
   imageUrl: string;
   categoryName: string;
+  slideUp?: boolean;
 }
 
 export default function BackgroundTransition({
-  imageUrl
+  imageUrl,
+  slideUp = false,
 }: BackgroundTransitionProps) {
   const [loaded, setLoaded] = useState(false);
   const [currentImage, setCurrentImage] = useState(imageUrl);
@@ -57,7 +59,7 @@ export default function BackgroundTransition({
   }, [imageUrl]);
 
   return (
-    <div className="fixed inset-0 -z-10">
+    <motion.div className="fixed inset-0 -z-10" animate={{ y: slideUp ? '-100vh' : 0 }} transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] }}>
       <motion.div
         key={currentImage}
         initial={{ opacity: 0 }}
@@ -101,6 +103,6 @@ export default function BackgroundTransition({
       />
 
       <div className="absolute inset-0 bg-[#1a1a1a] -z-10" />
-    </div>
+    </motion.div>
   );
 }

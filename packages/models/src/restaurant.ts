@@ -29,3 +29,4 @@ export interface Restaurant {
   rating?: number;
 }
 
+

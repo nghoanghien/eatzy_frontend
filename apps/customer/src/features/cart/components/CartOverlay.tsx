@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "@repo/ui/motion";
 import { X, Plus, Minus } from "@repo/ui/icons";
 import { useCartStore } from "@repo/store";
 import { useEffect } from "react";
+import Image from "next/image";
 
 export default function CartOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { items, addItem, removeItem, setQuantity, total } = useCartStore();
@@ -50,12 +51,13 @@ export default function CartOverlay({ open, onClose }: { open: boolean; onClose:
                   {items.map((it) => (
                     <li key={it.id} className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 border border-white/20 flex items-center justify-center">
+                        <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-white/10 border border-white/20 flex items-center justify-center">
                           {it.imageUrl ? (
-                            <img
+                            <Image
                               src={it.imageUrl}
                               alt={it.name}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           ) : (
                             <div className="text-white/60 text-xs">

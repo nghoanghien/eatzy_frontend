@@ -1,25 +1,91 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import HomeHeader from "@/features/home/components/HomeHeader";
 import CartOverlay from "@/features/cart/components/CartOverlay";
 import ProtectedMenuOverlay from "@/features/navigation/components/ProtectedMenuOverlay";
 import SearchOverlay from "@/features/search/components/SearchOverlay";
+import { motion, AnimatePresence } from "@repo/ui/motion";
+import { useSearch } from "@/features/search/hooks/useSearch";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { isSearching, performSearch } = useSearch();
+  const isSearchMode = searchParams.has("q");
+  const isSearchBarCompact = !isHeaderVisible && isSearchMode;
+
+  // Listen to scroll visibility events from SearchResults
+  useEffect(() => {
+    const handleHeaderVisibility = (e: Event) => {
+      const customEvent = e as CustomEvent<{ visible: boolean }>;
+      setIsHeaderVisible(customEvent.detail.visible);
+    };
+
+    window.addEventListener('searchHeaderVisibility', handleHeaderVisibility);
+    return () => window.removeEventListener('searchHeaderVisibility', handleHeaderVisibility);
+  }, []);
+
+  // Reset header visibility when leaving search mode
+  useEffect(() => {
+    if (!isSearchMode) {
+      setIsHeaderVisible(true);
+    }
+  }, [isSearchMode]);
+
+  const handleSearch = (query: string) => {
+    performSearch(query);
+  };
+
+  // Close overlay once we enter search mode (after shimmer completes)
+  useEffect(() => {
+    if (isSearchMode) setSearchOpen(false);
+  }, [isSearchMode]);
+
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      <HomeHeader
-        onMenuClick={() => setMenuOpen(true)}
-        onFavoritesClick={() => {}}
-        onSearchClick={() => setSearchOpen(true)}
-        onCartClick={() => setCartOpen(true)}
-      />
+    <div className="relative min-h-screen w-full overflow-x-hidden">
+      <AnimatePresence>
+        {(!isSearchMode || isHeaderVisible) && (
+          <motion.div
+            initial={{ y: 0, opacity: 1 }}
+            animate={{ 
+              y: isSearchMode && !isHeaderVisible ? -100 : 0,
+              opacity: isSearchMode && !isHeaderVisible ? 0 : 1,
+            }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
+          >
+            <HomeHeader
+              onMenuClick={() => setMenuOpen(true)}
+              onFavoritesClick={() => {}}
+              onSearchClick={() => setSearchOpen(true)}
+              onCartClick={() => setCartOpen(true)}
+              hideSearchIcon={isSearchMode}
+              onLogoClick={() => {
+                const next = new URLSearchParams(searchParams.toString());
+                next.delete('q');
+                router.replace(`?${next.toString()}`, { scroll: false });
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       <CartOverlay open={cartOpen} onClose={() => setCartOpen(false)} />
       <ProtectedMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchOverlay 
+        open={searchOpen} 
+        onClose={() => setSearchOpen(false)} 
+        onSearch={handleSearch}
+        isSearchMode={isSearchMode}
+        isSearchBarCompact={isSearchBarCompact}
+        isSearching={isSearching}
+      />
       {children}
     </div>
   );

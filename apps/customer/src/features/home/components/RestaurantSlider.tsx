@@ -3,6 +3,7 @@
 import { motion, AnimatePresence, PanInfo } from '@repo/ui/motion';
 import { Restaurant } from '@repo/models';
 import { ChevronLeft, ChevronRight } from '@repo/ui/icons';
+import Image from 'next/image';
 
 interface RestaurantSliderProps {
   restaurants: Restaurant[];
@@ -117,13 +118,14 @@ export default function RestaurantSlider({
                     >
                       <div className="flex flex-col">
                         <div
-                          className="w-full rounded-xl overflow-hidden shadow-2xl"
+                          className="relative w-full rounded-xl overflow-hidden shadow-2xl"
                           style={{ height: `${imageHeight}px` }}
                         >
-                          <img
-                            src={restaurant.imageUrl}
+                          <Image
+                            src={restaurant.imageUrl ?? 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800'}
                             alt={restaurant.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                           />
                         </div>
                         <AnimatePresence mode="wait">

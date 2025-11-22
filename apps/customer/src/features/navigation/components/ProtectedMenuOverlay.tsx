@@ -1,17 +1,28 @@
 "use client";
 import { motion, AnimatePresence } from "@repo/ui/motion";
-import { History, ShoppingCart, Heart } from "@repo/ui/icons";
+import { History, Home, Heart } from "@repo/ui/icons";
 import { NavItem, NavItemShimmer, ProfileShimmer } from "@repo/ui";
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const params = useSearchParams();
+  const pathname = usePathname();
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 400); return () => clearTimeout(t); }, []);
 
+  const handleHomeClick = () => {
+    const next = new URLSearchParams(params.toString());
+    next.delete('q');
+    router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+    onClose();
+  };
+
   const customerItems = [
-    { id: "history", icon: History, text: "Lịch sử đơn hàng" },
-    { id: "current", icon: ShoppingCart, text: "Đơn hiện tại" },
-    { id: "favorites", icon: Heart, text: "Yêu thích" },
+    { id: "home", icon: Home, text: "Trang chủ", onClick: handleHomeClick },
+    { id: "history", icon: History, text: "Lịch sử đơn hàng", onClick: onClose },
+    { id: "favorites", icon: Heart, text: "Yêu thích", onClick: onClose },
   ];
 
   return (
@@ -59,12 +70,14 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
                 customerItems.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <NavItem
-                      key={item.id}
-                      icon={<Icon size={20} className="text-white" />} text={item.text}
-                      expanded={true}
-                      active={false}
-                    />
+                    <div key={item.id} onClick={item.onClick} className="cursor-pointer">
+                      <NavItem
+                        icon={<Icon size={20} className="text-white" />} 
+                        text={item.text}
+                        expanded={true}
+                        active={false}
+                      />
+                    </div>
                   );
                 })
               )}

@@ -10,6 +10,8 @@ interface HomeHeaderProps {
   onFavoritesClick?: () => void;
   onSearchClick?: () => void;
   onCartClick?: () => void;
+  hideSearchIcon?: boolean;
+  onLogoClick?: () => void;
 }
 
 export default function HomeHeader({
@@ -17,11 +19,13 @@ export default function HomeHeader({
   onFavoritesClick,
   onSearchClick,
   onCartClick,
+  hideSearchIcon = false,
+  onLogoClick,
 }: HomeHeaderProps) {
   // const [layoutView, setLayoutView] = useState<'grid' | 'list'>('grid');
 
   return (
-    <header className="absolute top-0 left-0 right-0 z-50 p-6">
+    <header className="fixed top-0 left-0 right-0 z-50 p-6">
       <div className="flex items-start justify-between">
         {/* Left Section */}
         <div className="flex flex-col gap-4">
@@ -39,9 +43,13 @@ export default function HomeHeader({
                 },
               }}
               onClick={onMenuClick}
-              className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+              className={`w-10 h-10 rounded-xl backdrop-blur-md border flex items-center justify-center transition-colors ${
+                hideSearchIcon 
+                  ? 'bg-gray-100 border-gray-200 hover:bg-gray-200' 
+                  : 'bg-white/10 border-white/20 hover:bg-white/20'
+              }`}
             >
-              <Menu className="w-5 h-5 text-white" />
+              <Menu className={`w-5 h-5 ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`} />
             </motion.button>
 
             <motion.div
@@ -49,9 +57,11 @@ export default function HomeHeader({
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <h1 className="text-3xl font-bold text-white tracking-tight">
-                my.<span className="text-white/90">Eatzy</span>
-              </h1>
+              <button onClick={onLogoClick} className="select-none">
+                <h1 className={`text-3xl font-bold tracking-tight ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`}>
+                  my.<span className={hideSearchIcon ? 'text-gray-700' : 'text-white/90'}>Eatzy</span>
+                </h1>
+              </button>
             </motion.div>
           </div>
 
@@ -76,32 +86,41 @@ export default function HomeHeader({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onFavoritesClick}
-            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
+            className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md border transition-colors ${
+              hideSearchIcon
+                ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                : 'bg-white/10 border-white/20 hover:bg-white/20'
+            }`}
           >
-            <BookHeart className="w-5 h-5 text-white" />
-            <span className="text-white text-sm font-medium">
+            <BookHeart className={`w-5 h-5 ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`} />
+            <span className={`text-sm font-medium ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`}>
               Đơn hàng hiện tại
             </span>
           </motion.button>
 
-          {/* Search */}
-          <motion.button
-            layoutId="search"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{
-              duration: 0.25,
-              layout: {
-                type: "spring",
-                damping: 16,
-                stiffness: 100,
-              },
-            }}
-            onClick={onSearchClick}
-            className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
-          >
-            <Search className="w-5 h-5 text-white" />
-          </motion.button>
+          {/* Search - hide when in search mode */}
+          {!hideSearchIcon && (
+            <motion.button
+              layoutId="search-bar"
+              initial={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{
+                duration: 0.25,
+                layout: {
+                  type: "spring",
+                  damping: 16,
+                  stiffness: 100,
+                },
+              }}
+              onClick={onSearchClick}
+              className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+            >
+              <Search className="w-5 h-5 text-white" />
+            </motion.button>
+          )}
 
           <motion.button
             layoutId="cart"
@@ -115,9 +134,13 @@ export default function HomeHeader({
               },
             }}
             onClick={onCartClick}
-            className="relative w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+            className={`relative w-10 h-10 rounded-xl backdrop-blur-md border flex items-center justify-center transition-colors ${
+              hideSearchIcon
+                ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                : 'bg-white/10 border-white/20 hover:bg-white/20'
+            }`}
           >
-            <ShoppingCart className="w-5 h-5 text-white" />
+            <ShoppingCart className={`w-5 h-5 ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`} />
             {/** Cart count badge */}
             <CartCountBadge />
           </motion.button>
@@ -136,4 +159,5 @@ function CartCountBadge() {
     </span>
   );
 }
+
 
