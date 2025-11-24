@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "@repo/ui/motion";
-import { X } from "@repo/ui/icons";
+import { X, Trash, Plus, Minus } from "@repo/ui/icons";
 import { useCartStore } from "@repo/store";
 import { useEffect } from "react";
 import { ImageWithFallback } from "@repo/ui";
@@ -8,7 +8,7 @@ import { formatVnd } from "@repo/lib";
 import { getRestaurantById } from "@/features/search/data/mockSearchData";
 
 export default function CartOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { items, addItem, removeItem, total, activeRestaurantId } = useCartStore();
+  const { items, addItem, removeItem, setQuantity, total, activeRestaurantId } = useCartStore();
   useEffect(() => {
     if (open && items.length === 0) {
       addItem({ id: "dish-001", name: "Traditional Sushi", price: 85000, imageUrl: "https://images.unsplash.com/photo-1540317584754-5079b12b2743?w=400&q=60", restaurantId: "rest-2", quantity: 1 });
@@ -51,65 +51,77 @@ export default function CartOverlay({ open, onClose }: { open: boolean; onClose:
                 <X className="w-4 h-4" />
               </motion.button>
             </div>
-            <div className="max-h-[calc(100vh-140px)] overflow-y-auto">
+            <div className="max-h-[calc(100vh-220px)] overflow-y-auto">
               {items.length === 0 ? (
                 <div className="p-6 text-[#555]">Chưa có món nào</div>
               ) : (
                 <ul className="divide-y divide-gray-200">
                   {items.map((it) => (
                     <li key={it.id} className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-white border border-gray-200 flex items-center justify-center">
+                      <div className="flex items-start gap-3">
+                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white border border-gray-200 flex items-center justify-center">
                           <ImageWithFallback src={it.imageUrl ?? ""} alt={it.name} fill className="object-cover" />
                         </div>
                         <div className="flex-1">
-                          <div className="text-[#1A1A1A] font-medium">{it.name}</div>
+                          <div className="flex items-start justify-between">
+                            <div className="text-[#1A1A1A] font-medium">{it.name}</div>
+                            <motion.button
+                              whileHover={{ scale: 1.06 }}
+                              whileTap={{ scale: 0.92 }}
+                              onClick={() => setQuantity(it.id, 0)}
+                              className="w-7 h-7 rounded-lg bg-gray-300 mx-2 flex items-center justify-center"
+                            >
+                              <Trash className="w-4 h-4 text-gray-700" />
+                            </motion.button>
+                          </div>
                           {it.options?.variant?.name && (
-                            <div className="text-[#555] text-xs">{it.options.variant.name}</div>
+                            <div className="text-[#555] text-xs">Vị cay: {it.options.variant.name}</div>
                           )}
                           {it.options?.addons && it.options.addons.length > 0 && (
-                            <div className="text-[#555] text-xs">{it.options.addons.map((a) => a.name).join(", ")}</div>
+                            <div className="text-[#555] text-xs">Topping: {it.options.addons.map((a) => a.name).join(", ")}</div>
                           )}
-                          <div className="text-[#1A1A1A] text-sm">{formatVnd(it.price * it.quantity)}</div>
-                        </div>
-                        <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-2 py-1">
-                          <motion.button
-                            whileHover={{ scale: 1.06 }}
-                            whileTap={{ scale: 0.92 }}
-                            onClick={() => removeItem(it.id)}
-                            className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-[#1A1A1A]"
-                          >
-                            −
-                          </motion.button>
-                          <AnimatePresence mode="wait">
-                            <motion.span
-                              key={it.quantity}
-                              initial={{ opacity: 0, y: 6 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -6 }}
-                              transition={{ duration: 0.18 }}
-                              className="w-8 text-center font-bold text-[#1A1A1A] text-sm"
-                            >
-                              {it.quantity}
-                            </motion.span>
-                          </AnimatePresence>
-                          <motion.button
-                            whileHover={{ scale: 1.06 }}
-                            whileTap={{ scale: 0.92 }}
-                            onClick={() =>
-                              addItem({
-                                id: it.id,
-                                name: it.name,
-                                price: it.price,
-                                imageUrl: it.imageUrl,
-                                restaurantId: it.restaurantId,
-                                quantity: 1,
-                              })
-                            }
-                            className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-[#1A1A1A]"
-                          >
-                            +
-                          </motion.button>
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="text-[#1A1A1A] font-semibold">{formatVnd(it.price)}</div>
+                            <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-2 py-1">
+                              <motion.button
+                                whileHover={{ scale: 1.06 }}
+                                whileTap={{ scale: 0.92 }}
+                                onClick={() => removeItem(it.id)}
+                                className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-[#1A1A1A]"
+                              >
+                                <Minus className="w-4 h-4" />
+                              </motion.button>
+                              <AnimatePresence mode="wait">
+                                <motion.span
+                                  key={it.quantity}
+                                  initial={{ opacity: 0, y: 6 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -6 }}
+                                  transition={{ duration: 0.18 }}
+                                  className="w-8 text-center font-bold text-[#1A1A1A] text-sm"
+                                >
+                                  {it.quantity}
+                                </motion.span>
+                              </AnimatePresence>
+                              <motion.button
+                                whileHover={{ scale: 1.06 }}
+                                whileTap={{ scale: 0.92 }}
+                                onClick={() =>
+                                  addItem({
+                                    id: it.id,
+                                    name: it.name,
+                                    price: it.price,
+                                    imageUrl: it.imageUrl,
+                                    restaurantId: it.restaurantId,
+                                    quantity: 1,
+                                  })
+                                }
+                                className="w-7 h-7 rounded-lg bg-[var(--primary)] text-white border border-[var(--primary)] flex items-center justify-center"
+                              >
+                                <Plus className="w-4 h-4" />
+                              </motion.button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </li>
@@ -117,9 +129,20 @@ export default function CartOverlay({ open, onClose }: { open: boolean; onClose:
                 </ul>
               )}
             </div>
-            <div className="p-4 border-t border-gray-200 flex items-center justify-between bg-white/60">
-              <div className="text-sm">Tổng</div>
-              <div className="text-lg font-semibold text-[var(--primary)]">{formatVnd(total())}</div>
+            <div className="p-4 border-t border-gray-200 bg-white/60">
+              <div className="flex items-center justify-between">
+                <div className="text-sm">Tổng số tiền</div>
+                <div className="text-lg font-semibold text-[var(--primary)]">{formatVnd(total())}</div>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={onClose}
+                className="mt-3 w-full h-12 rounded-2xl bg-[var(--primary)] text-white font-semibold shadow-md"
+              >
+                Xem đơn hàng
+              </motion.button>
+              <div className="mt-2 text-xs text-[#555]">Xem phí áp dụng và dùng mã khuyến mại ở bước tiếp theo</div>
             </div>
           </motion.div>
         </>
