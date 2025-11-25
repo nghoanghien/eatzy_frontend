@@ -165,7 +165,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
-            <RightSidebar restaurantName={restaurant?.name} totalPayable={totalPayable} />
+            <RightSidebar restaurantName={restaurant?.name} totalPayable={totalPayable} onAddressChange={(addr) => setAddress(addr)} />
           </div>
         </div>
       </div>

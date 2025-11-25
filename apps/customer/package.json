@@ -10,15 +10,17 @@
   },
   "dependencies": {
     "@repo/api": "workspace:*",
+    "@repo/fonts": "workspace:*",
     "@repo/lib": "workspace:*",
-    "@repo/store": "workspace:*",
     "@repo/models": "workspace:*",
+    "@repo/store": "workspace:*",
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@repo/fonts": "workspace:*",
+    "mapbox-gl": "^3.16.0",
     "next": "14.2.33",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-map-gl": "^8.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",
