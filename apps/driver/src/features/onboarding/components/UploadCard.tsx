@@ -1,6 +1,6 @@
 "use client";
 import { useRef } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera } from "@repo/ui/icons";
 import { Button } from '@repo/ui';
 
 export default function UploadCard({ label, value, onChange }: { label: string; value?: string; onChange: (url: string) => void }) {
