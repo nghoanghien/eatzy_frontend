@@ -2,10 +2,14 @@
 import { useEffect } from "react";
 import { useLoading } from "@repo/ui";
 import { CheckCircle2 } from "@repo/ui/icons";
+import { Button } from "@repo/ui";
+import { useRouter } from "next/navigation";
 
 export default function PendingReviewPage() {
+  const router = useRouter();
   const { hide } = useLoading();
   useEffect(() => {
+    hide();
     const t = setTimeout(() => hide(), 1500);
     return () => clearTimeout(t);
   }, [hide]);
@@ -17,6 +21,9 @@ export default function PendingReviewPage() {
           <div>Đã nộp hồ sơ thành công</div>
         </div>
         <div className="mt-2 text-[#555]">Hồ sơ của bạn đang chờ kiểm duyệt. Vui lòng theo dõi phản hồi.</div>
+        <div className="mt-6">
+          <Button variant="outline" size="lg" onClick={() => router.push("/login")} className="w-full">Quay về trang đăng nhập</Button>
+        </div>
       </div>
     </div>
   );
