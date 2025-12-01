@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "@repo/ui/motion";
 import type { DriverActiveOrder } from "@repo/types";
-import { Phone, Compass, FileText, DollarSign, MapPin, Utensils } from "@repo/ui/icons";
+import { Phone, Compass, DollarSign, MapPin, Utensils } from "@repo/ui/icons";
 
 export default function CurrentOrderPanel({ order, onArrived }: { order: DriverActiveOrder; onArrived?: () => void }) {
   const statusText = order.phase === 'PICKUP' ? 'Đang lấy đơn hàng' : 'Đang giao đơn hàng';
