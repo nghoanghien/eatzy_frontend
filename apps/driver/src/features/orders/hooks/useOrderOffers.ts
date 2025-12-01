@@ -41,6 +41,11 @@ export default function useOrderOffers(online: boolean, hasActiveOrder: boolean)
       phase: "PICKUP" as DriverOrderPhase,
       pickup: offer.pickup,
       dropoff: offer.dropoff,
+      driverLocation: {
+        // Mock driver location slightly offset from pickup for demo
+        lng: offer.pickup.lng - 0.002,
+        lat: offer.pickup.lat - 0.002
+      },
       paymentMethod: offer.paymentMethod,
       earnings: {
         orderId: offer.id,

@@ -36,6 +36,16 @@ export default function CurrentOrderPanel({ order, onComplete }: { order: Driver
     }
   };
 
+  const handleNavigation = () => {
+    // Determine destination based on stage
+    const destination = (stage === 'AT_STORE' || stage === 'PICKED_UP')
+      ? order.pickup
+      : order.dropoff;
+
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destination.lat},${destination.lng}&travelmode=driving`;
+    window.open(url, '_blank');
+  };
+
   const { title, buttonText } = stageConfig[stage];
 
   return (
@@ -191,6 +201,7 @@ export default function CurrentOrderPanel({ order, onComplete }: { order: Driver
                       <motion.button
                         whileHover={{ scale: 1.04 }}
                         whileTap={{ scale: 0.98 }}
+                        onClick={handleNavigation}
                         className="h-11 text-[#555] flex flex-col items-center justify-center gap-2 font-semibold hover:text-[var(--primary)] transition-colors"
                       >
                         <Compass size={16} />

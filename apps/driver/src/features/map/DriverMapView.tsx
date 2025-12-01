@@ -2,13 +2,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Map, { Marker } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
-// locate button is handled at Home overlay
+import type { DriverActiveOrder } from "@repo/types";
+import DriverOrderMapView from "./DriverOrderMapView";
 
 type Coords = { lng: number; lat: number };
 type MapFly = { flyTo: (opts: { center: [number, number]; zoom?: number; duration?: number }) => void };
 type MapLike = { getMap: () => MapFly };
 
-export default function DriverMapView({ locateVersion = 0 }: { locateVersion?: number }) {
+export default function DriverMapView({ locateVersion = 0, activeOrder }: { locateVersion?: number; activeOrder?: DriverActiveOrder | null }) {
   const token = "pk.eyJ1Ijoibmdob2FuZ2hpZW4iLCJhIjoiY21pZG04cmNxMDg3YzJucTFvdzgyYzV5ZiJ9.adJF69BzLTkmZZysMXgUhw";
   const mapRef = useRef<unknown>(null);
   const [userPos, setUserPos] = useState<Coords | null>(null);
@@ -60,6 +61,16 @@ export default function DriverMapView({ locateVersion = 0 }: { locateVersion?: n
     );
   }
 
+  // If there's an active order, show the order map view
+  if (activeOrder) {
+    return (
+      <div className="w-full h-full">
+        <DriverOrderMapView order={activeOrder} />
+      </div>
+    );
+  }
+
+  // Otherwise show normal driver location tracking
   return (
     <div className="w-full h-full">
       <Map
@@ -79,8 +90,6 @@ export default function DriverMapView({ locateVersion = 0 }: { locateVersion?: n
             </div>
           </Marker>
         )}
-
-        {/* Locate button moved to Home cluster overlay */}
 
         {error && (
           <div className="absolute left-2 bottom-2 bg-white/90 backdrop-blur-sm border border-gray-200 text-xs text-gray-700 px-2 py-1 rounded">

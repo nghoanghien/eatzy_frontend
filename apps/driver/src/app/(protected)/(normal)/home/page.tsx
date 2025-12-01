@@ -18,7 +18,7 @@ export default function Page() {
   const { currentOffer, countdown, acceptOffer, rejectOffer } = useOrderOffers(online, !!activeOrder);
   return (
     <div className="w-full h-full">
-      <DriverMapView locateVersion={locateVersion} />
+      <DriverMapView locateVersion={locateVersion} activeOrder={activeOrder} />
       <div className="absolute left-4 right-4 bottom-[96px] space-y-3">
         <div className="flex items-center justify-between gap-3">
           <ConnectToggle online={online} onChange={setOnline} className="" />

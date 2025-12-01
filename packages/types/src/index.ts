@@ -138,19 +138,20 @@ export type DriverOrderOffer = {
   orderValue: number; // total_amount
   paymentMethod: PaymentMethod;
   distanceKm: number;
-  pickup: { name: string; address: string };
-  dropoff: { name?: string; address: string };
+  pickup: { name: string; address: string; lng: number; lat: number };
+  dropoff: { name?: string; address: string; lng: number; lat: number };
   expireSeconds: number; // 30s countdown
 };
 
 export type DriverActiveOrder = {
   id: string;
   phase: DriverOrderPhase; // PICKUP or DELIVERY
-  pickup: { name: string; address: string };
-  dropoff: { name?: string; address: string };
+  pickup: { name: string; address: string; lng: number; lat: number };
+  dropoff: { name?: string; address: string; lng: number; lat: number };
+  driverLocation: { lng: number; lat: number };
   earnings: DriverEarningsSummary;
   paymentMethod: PaymentMethod;
   distanceKm?: number;
 };
 
-export {};
+export { };
