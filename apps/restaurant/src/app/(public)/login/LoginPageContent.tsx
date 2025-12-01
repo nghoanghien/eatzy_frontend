@@ -18,8 +18,8 @@ export default function LoginPageContent() {
   const handleSuccess = () => {
     show("Đang đăng nhập...");
     document.cookie = "restaurant_auth=1; path=/";
-    router.push("/dashboard");
-    // Note: Loading will be hidden in dashboard page after 1.5s
+    router.push("/orders");
+    // Note: Loading will be hidden in orders page after 1.5s
   };
 
   return (
