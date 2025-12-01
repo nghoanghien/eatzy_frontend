@@ -42,7 +42,12 @@ export default function Page() {
           </motion.div>
         )}
         {activeOrder && (
-          <CurrentOrderPanel order={activeOrder} onArrived={() => { setActiveOrder({ ...activeOrder, phase: activeOrder.phase === 'PICKUP' ? 'DELIVERY' : 'DELIVERY' }); }} />
+          <CurrentOrderPanel
+            order={activeOrder}
+            onComplete={() => {
+              setActiveOrder(null);
+            }}
+          />
         )}
       </div>
       <OnlineStatusBadge online={online} />
