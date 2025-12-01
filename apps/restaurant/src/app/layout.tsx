@@ -18,7 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} ${inter.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <div id="global-cart-button-root">
+            {/* CartButton is client component, import here */}
+          </div>
+        </Providers>
       </body>
     </html>
   );
