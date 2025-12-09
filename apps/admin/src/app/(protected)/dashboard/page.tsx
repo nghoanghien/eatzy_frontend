@@ -11,7 +11,7 @@ import {
   DollarSign,
   Activity
 } from "@repo/ui/icons";
-import { ModernHeader, StatusBadge } from "@repo/ui";
+import { StatusBadge } from "@repo/ui";
 import { motion } from "@repo/ui/motion";
 
 interface StatCardProps {
