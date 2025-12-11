@@ -4,13 +4,14 @@ import { LoginForm, LoginIllustration } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
 import { motion, AnimatePresence } from "@repo/ui/motion";
+import { useLogin } from "@/features/auth/hooks/useLogin";
 
 /**
  * Login Page Content - Pattern from RoleCard.jsx
  * 
  * Structure (line 108-289 of RoleCard):
  * <AnimatePresence mode="wait">
- *   <motion.div layoutId={`role-card-${role.id}`}>
+ *   <motion.div layoutId={`role - card - ${ role.id } `}>
  *     content with buttons that have their own layoutId
  *   </motion.div>
  * </AnimatePresence>
@@ -19,6 +20,7 @@ import { motion, AnimatePresence } from "@repo/ui/motion";
  */
 export default function LoginPageContent() {
   const router = useRouter();
+  const { handleLogin, isLoading, error } = useLogin(); // Hook usage
 
   const form = useZodForm<LoginFormData>({
     schema: loginSchema,
@@ -28,6 +30,10 @@ export default function LoginPageContent() {
 
   const handleRegisterClick = () => {
     router.push("/register");
+  };
+
+  const onSubmit = (data: LoginFormData) => {
+    handleLogin(data);
   };
 
   return (
@@ -48,11 +54,11 @@ export default function LoginPageContent() {
             <div className="hidden lg:flex relative overflow-hidden bg-white/5 backdrop-blur-md">
               {/* Decorative gradient background */}
               <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/10 via-transparent to-[var(--secondary)]/10"></div>
-              
+
               {/* Floating orbs */}
               <div className="absolute top-10 right-10 w-24 h-24 bg-[var(--primary)]/20 rounded-full blur-2xl animate-pulse-slow"></div>
               <div className="absolute bottom-20 left-10 w-32 h-32 bg-[var(--secondary)]/20 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-              
+
               <LoginIllustration />
             </div>
 
@@ -62,8 +68,11 @@ export default function LoginPageContent() {
               <div className="relative z-10">
                 <LoginForm
                   form={form}
+                  onSubmit={onSubmit}
+                  isLoading={isLoading}
+                  error={error}
                   onForgotPassword={() => router.push("/forgot-password")}
-                  onSuccess={() => router.push("/home")}
+                  onSuccess={() => { }} // Handle inside hook
                   onRegister={handleRegisterClick}
                 />
               </div>
