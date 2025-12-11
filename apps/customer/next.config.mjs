@@ -9,6 +9,14 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy/:path*',
+        destination: 'http://113.177.135.214:38284/:path*', // Proxy to Backend
+      },
+    ];
+  },
 };
 
 export default nextConfig;

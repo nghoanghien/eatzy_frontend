@@ -1,7 +1,9 @@
 import axios from "axios";
 
 export const http = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
+  // Use Next.js Rewrite Proxy to solve Mixed Content (HTTP backend vs HTTPS frontend)
+  baseURL: "/api/proxy",
+  // baseURL: process.env.NEXT_PUBLIC_API_URL || "/api", // OLD CONFIG
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
