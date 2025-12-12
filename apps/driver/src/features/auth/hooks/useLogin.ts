@@ -12,26 +12,28 @@ export const useLogin = () => {
     setIsLoading(true);
     setError(null);
 
+    // Clear old token before login to prevent sending invalid token in Authorization header
+    // causing backend to reject the request with 401/403 despite login endpoint being public
+    localStorage.removeItem("access_token");
+
     try {
       const res = await authApi.login({
         username: data.email,
         password: data.password,
       });
 
-      // res is IBackendRes<IResLoginDTO>
-      // The actual login data is inside res.data
       if (res.data?.access_token && res.data?.user) {
-        // Save to store (and local storage via persist middleware)
         setLogin(res.data.access_token, res.data.user);
-
-        // Also save to raw localStorage for Axios interceptor to pick up immediately
         localStorage.setItem("access_token", res.data.access_token);
-
-        // DO NOT setIsLoading(false) here on success
-        // This keeps the spinner going while parent component redirects
+        // DO NOT setIsLoading(false) here on success to keep spinner during redirect
         return true;
       }
+
+      // FIX: Handle case where response is OK but data is invalid (e.g. Proxy error)
+      setError("Đăng nhập thất bại. Phản hồi không hợp lệ.");
+      setIsLoading(false);
       return false;
+
     } catch (err: unknown) {
       if (typeof err === "object" && err !== null) {
         const maybeMessage = (err as { message?: string | string[] }).message;
@@ -57,7 +59,6 @@ export const useLogin = () => {
         setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
       }
 
-      // Stop loading ONLY on error
       setIsLoading(false);
       return false;
     }

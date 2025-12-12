@@ -11,6 +11,7 @@ export const useLogin = () => {
   const handleLogin = async (data: LoginFormData): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
+    localStorage.removeItem("access_token");
 
     try {
       const res = await authApi.login({
@@ -18,20 +19,16 @@ export const useLogin = () => {
         password: data.password,
       });
 
-      // res is IBackendRes<IResLoginDTO>
-      // The actual login data is inside res.data
       if (res.data?.access_token && res.data?.user) {
-        // Save to store (and local storage via persist middleware)
         setLogin(res.data.access_token, res.data.user);
-
-        // Also save to raw localStorage for Axios interceptor to pick up immediately
         localStorage.setItem("access_token", res.data.access_token);
-
-        // DO NOT setIsLoading(false) here on success
-        // This keeps the spinner going while parent component redirects
         return true;
       }
+
+      setError("Đăng nhập thất bại. Phản hồi không hợp lệ.");
+      setIsLoading(false);
       return false;
+
     } catch (err: unknown) {
       if (typeof err === "object" && err !== null) {
         const maybeMessage = (err as { message?: string | string[] }).message;
@@ -57,7 +54,6 @@ export const useLogin = () => {
         setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
       }
 
-      // Stop loading ONLY on error
       setIsLoading(false);
       return false;
     }
