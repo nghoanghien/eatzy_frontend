@@ -15,6 +15,7 @@ export * from "./icons";
 export { default as LoadingOverlay } from "./feedback/LoadingOverlay";
 export { default as LoadingSpinner } from "./feedback/LoadingSpinner";
 export * from "./providers/LoadingProvider";
+export * from "./providers/NotificationProvider";
 export { default as LoginForm } from "./auth/LoginForm";
 export { default as LoginIllustration } from "./auth/LoginIllustration";
 export { default as NavItem } from "./navigation/NavItem";

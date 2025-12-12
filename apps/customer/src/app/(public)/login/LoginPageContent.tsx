@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginForm, LoginIllustration, useLoading } from "@repo/ui";
+import { LoginForm, LoginIllustration, useLoading, useNotification } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
 import { motion, AnimatePresence } from "@repo/ui/motion";
@@ -30,6 +30,7 @@ export default function LoginPageContent() {
 
   // Use global loading context
   const { show } = useLoading();
+  const { showNotification } = useNotification();
 
   const handleRegisterClick = () => {
     router.push("/register");
@@ -39,6 +40,12 @@ export default function LoginPageContent() {
     const success = await handleLogin(data);
 
     if (success) {
+      showNotification({
+        message: "Đăng nhập thành công!",
+        type: "success",
+        format: "excel", // Green icon
+        autoHideDuration: 3000
+      });
       show("Đang chuyển hướng về trang chủ...");
       router.push("/home");
     }
