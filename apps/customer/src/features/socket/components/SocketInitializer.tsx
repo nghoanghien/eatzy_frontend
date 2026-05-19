@@ -3,6 +3,7 @@ import React from "react";
 import { SocketProvider } from "@repo/socket";
 import { sileo } from "@/components/DynamicIslandToast";
 import { getAccessToken } from "@repo/api";
+import { GlobalMessageSubscriber } from "./GlobalMessageSubscriber";
 
 /**
  * Socket Initializer for the Customer Application.
@@ -62,6 +63,7 @@ export function SocketInitializer({ children }: { children: React.ReactNode }) {
         console.error("STOMP Error:", frame);
       }}
     >
+      <GlobalMessageSubscriber />
       {children}
     </SocketProvider>
   );

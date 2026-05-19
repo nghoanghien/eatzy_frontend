@@ -3,8 +3,8 @@ import React from "react";
 import { SocketProvider } from "@repo/socket";
 import { useAuthStore } from "@repo/store";
 import { sileo } from "@/components/DynamicIslandToast";
-
 import { getAccessToken } from "@repo/api";
+import { GlobalMessageSubscriber } from "./GlobalMessageSubscriber";
 
 /**
  * Socket Initializer for the Driver Application.
@@ -72,6 +72,7 @@ export function SocketInitializer({ children }: { children: React.ReactNode }) {
         });
       }}
     >
+      <GlobalMessageSubscriber />
       {children}
     </SocketProvider>
   );

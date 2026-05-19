@@ -2,7 +2,7 @@
 
 import { Check } from "@repo/ui";
 import { motion } from "@repo/ui/motion";
-import { AlertCircle, Store, Bike, ChevronRight, Trash2, Wallet } from "lucide-react";
+import { AlertCircle, Store, Bike, ChevronRight, Trash2, Wallet, User } from "lucide-react";
 import { SileoOptions } from "sileo";
 
 export type ToastActionType =
@@ -12,12 +12,14 @@ export type ToastActionType =
   | "profile_update_error"
   | "wallet_deposit_success"
   | "wallet_withdraw_success"
+  | "chat_message"
   | "error";
 
 export interface ExtendedToastOptions extends SileoOptions {
   actionType?: ToastActionType;
   avatarUrl?: string;
   onViewOrder?: () => void;
+  onReply?: () => void;
   dishOptions?: string[];
 }
 
@@ -125,6 +127,71 @@ export function renderCustomDescription(opts: ExtendedToastOptions) {
             <p className="text-white/50 text-[12px] font-medium leading-snug">
               {String(opts.description || "Your information has been saved")}
             </p>
+          </div>
+        </div>
+      );
+
+    case "chat_message":
+      return (
+        <div className="flex flex-col w-full py-2 gap-3">
+          <div className="flex items-center gap-3">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 bg-white/10 flex items-center justify-center"
+            >
+              {opts.avatarUrl ? (
+                <img
+                  src={opts.avatarUrl}
+                  className="w-full h-full object-cover"
+                  alt="Avatar"
+                />
+              ) : (
+                <User className="w-6 h-6 text-white" />
+              )}
+            </motion.div>
+
+            <div className="flex-1 min-w-0 text-left">
+              <div className="flex items-center justify-between">
+                <h4 className="text-white font-bold text-[15px] leading-tight truncate">
+                  {opts.title || "Khách hàng"}
+                </h4>
+                <span className="text-[10px] text-white/40 font-semibold bg-white/5 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Tin nhắn mới
+                </span>
+              </div>
+              <p className="text-white/80 text-[13px] mt-1 font-medium line-clamp-2">
+                {String(opts.description)}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2 mt-1">
+            <motion.button
+              whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.15)" }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                opts.onReply?.();
+                // Close the toast
+                const clearBtn = document.querySelector('[data-sileo-clear]');
+                if (clearBtn) (clearBtn as HTMLElement).click();
+              }}
+              className="flex-1 py-2.5 rounded-xl bg-white/10 border border-white/5 text-white font-bold text-xs transition-all hover:bg-white/20"
+            >
+              Trả lời
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                // Just dismiss
+                const clearBtn = document.querySelector('[data-sileo-clear]');
+                if (clearBtn) (clearBtn as HTMLElement).click();
+              }}
+              className="px-4 py-2.5 rounded-xl bg-transparent text-white/50 font-bold text-xs transition-all hover:text-white"
+            >
+              Bỏ qua
+            </motion.button>
           </div>
         </div>
       );
