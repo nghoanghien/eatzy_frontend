@@ -516,7 +516,7 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
 
       {/* Floating Scroll to Bottom / Unread Badge */}
       <AnimatePresence>
-        {showScrollDownBtn && (
+        {showScrollDownBtn && unreadBelowCount === 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.6, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -538,14 +538,34 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
               </svg>
-
-              {/* Unread badge count below scroll viewport */}
-              {unreadBelowCount > 0 && (
-                <span className="absolute -top-2 -left-2 min-w-[20px] h-[20px] px-1.5 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border border-white shadow-sm animate-pulse">
-                  {unreadBelowCount}
-                </span>
-              )}
             </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Centered Unread Banner */}
+      <AnimatePresence>
+        {showScrollDownBtn && unreadBelowCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            onClick={scrollToBottom}
+            className="absolute bottom-24 left-1/2 z-30 transform cursor-pointer bg-white/90 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.1)] border-2 border-white flex items-center gap-1.5 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all active:scale-95 group"
+          >
+            <span className="text-[12px] font-bold tracking-tight pt-0.5 text-gray-600 group-hover:text-primary transition-colors">
+              {unreadBelowCount} tin nhắn chưa đọc
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={3}
+              stroke="currentColor"
+              className="w-3 h-3 text-primary group-hover:text-primary transition-colors animate-bounce mt-0.5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
           </motion.div>
         )}
       </AnimatePresence>
