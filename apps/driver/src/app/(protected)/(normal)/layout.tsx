@@ -69,6 +69,7 @@ function AnimatedNavigation() {
   );
 }
 
+import React, { Suspense } from "react";
 import DriverHeader from "@/features/layout/components/DriverHeader";
 import GlobalSocketHandlers from "./components/GlobalSocketHandlers";
 
@@ -87,7 +88,9 @@ export default function NormalLayout({ children }: { children: React.ReactNode }
           <DriverHeader />
           <GlobalSocketHandlers />
           <div className="flex-1 relative overflow-hidden">
-            {children}
+            <Suspense fallback={null}>
+              {children}
+            </Suspense>
           </div>
           <NormalLoadingOverlay />
           <AnimatedNavigation />

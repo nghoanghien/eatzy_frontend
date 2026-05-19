@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import { SocketProvider } from "@repo/socket";
 import { useAuthStore } from "@repo/store";
 import { sileo } from "@/components/DynamicIslandToast";
@@ -72,7 +72,9 @@ export function SocketInitializer({ children }: { children: React.ReactNode }) {
         });
       }}
     >
-      <GlobalMessageSubscriber />
+      <Suspense fallback={null}>
+        <GlobalMessageSubscriber />
+      </Suspense>
       {children}
     </SocketProvider>
   );

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import { SocketProvider } from "@repo/socket";
 import { sileo } from "@/components/DynamicIslandToast";
 import { getAccessToken } from "@repo/api";
@@ -63,7 +63,9 @@ export function SocketInitializer({ children }: { children: React.ReactNode }) {
         console.error("STOMP Error:", frame);
       }}
     >
-      <GlobalMessageSubscriber />
+      <Suspense fallback={null}>
+        <GlobalMessageSubscriber />
+      </Suspense>
       {children}
     </SocketProvider>
   );

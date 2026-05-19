@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import MessagesLayout from "@/features/messages/components/MessagesLayout";
 
 export const metadata = {
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function MessagesPage() {
-  return <MessagesLayout />;
+  return (
+    <Suspense fallback={<div>Loading chat...</div>}>
+      <MessagesLayout />
+    </Suspense>
+  );
 }
