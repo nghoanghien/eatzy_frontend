@@ -37,7 +37,9 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
     stickyOrder: apiStickyOrder,
     sendMessage,
     refetch,
-    orderId
+    orderId,
+    handleUserTyping,
+    partnerIsTyping
   } = useChatSession({
     chatId: chat.id,
     initialMessages: chat.messages,
@@ -88,12 +90,12 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
     }, 100);
   };
 
-  // Scroll to bottom whenever messages change or loading ends
+  // Scroll to bottom whenever messages change, loading ends, or typing status changes
   useLayoutEffect(() => {
     if (scrollRef.current && !isLoading) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [localMessages, isLoading]);
+  }, [localMessages, isLoading, partnerIsTyping]);
 
   return (
     <div className="flex flex-col h-full bg-[#F8F9FA] overflow-hidden relative">
@@ -359,6 +361,23 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
                     </div>
                   );
                 })}
+                {partnerIsTyping && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                    className="flex items-center gap-2 mb-4 self-start bg-white/50 backdrop-blur-sm px-4 py-3 rounded-[24px] border-2 border-white shadow-[0_0_20px_rgba(0,0,0,0.12)] rounded-bl-[8px]"
+                  >
+                    <div className="flex gap-1">
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                    <span className="text-[11px] font-bold text-gray-500 tracking-tight uppercase pt-0.5">
+                      {chat.partnerName} đang soạn tin...
+                    </span>
+                  </motion.div>
+                )}
               </div>
             )}
           </AnimatePresence>
@@ -387,7 +406,10 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
             <textarea
               ref={textareaRef}
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={(e) => {
+                setInputText(e.target.value);
+                handleUserTyping();
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();

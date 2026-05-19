@@ -3,6 +3,7 @@ import { chatApi, orderApi } from '@repo/api';
 import { useOrderChat } from '@repo/socket';
 import { ChatMessage } from '../data/mockMessages';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useChatTyping } from './useChatTyping';
 
 interface UseChatSessionProps {
   chatId: string;
@@ -140,6 +141,11 @@ export function useChatSession({ chatId, initialMessages, isDriverApp = true }: 
 
   const { sendMessage, sendTypingStatus } = useOrderChat(orderId, onMessageReceived);
 
+  const { partnerIsTyping, handleUserTyping } = useChatTyping({
+    orderId,
+    isDriverApp
+  });
+
   // Send message action with optimistic update
   const handleSendMessage = useCallback((text: string) => {
     if (!text.trim()) return;
@@ -185,6 +191,8 @@ export function useChatSession({ chatId, initialMessages, isDriverApp = true }: 
     stickyOrder,
     sendMessage: handleSendMessage,
     sendTypingStatus,
+    handleUserTyping,
+    partnerIsTyping,
     orderId,
     refetch
   };
