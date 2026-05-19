@@ -30,6 +30,12 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
   const [stickyOrder, setStickyOrder] = useState<any>(null);
   const [inputText, setInputText] = useState("");
 
+  const initialUnreadCount = useRef(chat.unreadCount || 0);
+  const hasScrolledToUnread = useRef(false);
+  const firstUnreadRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollDownBtn, setShowScrollDownBtn] = useState(false);
+  const [unreadBelowCount, setUnreadBelowCount] = useState(0);
+
   const {
     localMessages,
     isLoading,
@@ -78,24 +84,89 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
     if (!inputText.trim()) return;
     sendMessage(inputText);
     setInputText("");
-
-    // Immediate smooth scroll to bottom after state update
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({
-          top: scrollRef.current.scrollHeight,
-          behavior: 'smooth'
-        });
-      }
-    }, 100);
+    handleImmediateScroll();
   };
 
-  // Scroll to bottom whenever messages change, loading ends, or typing status changes
+  // Scroll to bottom helper
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Immediate smooth scroll to bottom after state update (when sending)
+  const handleImmediateScroll = () => {
+    setTimeout(scrollToBottom, 100);
+  };
+
+  // Scroll to bottom on mount ONLY when there are no unread messages
   useLayoutEffect(() => {
-    if (scrollRef.current && !isLoading) {
+    if (scrollRef.current && !isLoading && initialUnreadCount.current === 0) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [localMessages, isLoading, partnerIsTyping]);
+  }, [localMessages, isLoading]);
+
+  // Scroll to first unread message such that it is positioned 2/3 of viewport from the top
+  useEffect(() => {
+    if (!isLoading && localMessages.length > 0 && initialUnreadCount.current > 0 && !hasScrolledToUnread.current) {
+      hasScrolledToUnread.current = true;
+      setTimeout(() => {
+        const element = firstUnreadRef.current;
+        const container = scrollRef.current;
+        if (element && container) {
+          const containerHeight = container.clientHeight;
+          const elementOffsetTop = element.offsetTop;
+          const targetScrollTop = elementOffsetTop - (containerHeight * 2 / 3);
+          container.scrollTo({
+            top: targetScrollTop,
+            behavior: 'auto'
+          });
+        }
+      }, 100);
+    }
+  }, [isLoading, localMessages]);
+
+  // Track scroll position to show/hide floating down button and calculate unread count below viewport
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const onScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isFar = scrollHeight - scrollTop - clientHeight > 300;
+      setShowScrollDownBtn(isFar);
+
+      if (initialUnreadCount.current > 0) {
+        let below = 0;
+        const msgList = localMessages;
+        const totalUnread = initialUnreadCount.current;
+        const unreadStartIndex = msgList.length - totalUnread;
+
+        for (let i = unreadStartIndex; i < msgList.length; i++) {
+          const msg = msgList[i];
+          const el = document.getElementById(`msg-container-${msg.id}`);
+          if (el) {
+            if (el.offsetTop > scrollTop + clientHeight - 40) {
+              below++;
+            }
+          } else {
+            below = totalUnread;
+          }
+        }
+        setUnreadBelowCount(below);
+      } else {
+        setUnreadBelowCount(0);
+      }
+    };
+
+    container.addEventListener('scroll', onScroll);
+    setTimeout(onScroll, 200);
+
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [localMessages, isLoading]);
 
   return (
     <div className="flex flex-col h-full bg-[#F8F9FA] overflow-hidden relative">
@@ -246,6 +317,7 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
                   );
 
                   const isSameGroupNext = isSamePersonNext && isWithinOneMinuteNext && !isNextNewDay;
+                  const isFirstUnread = initialUnreadCount.current > 0 && idx === localMessages.length - initialUnreadCount.current;
 
                   const getDateLabel = (date: Date) => {
                     const today = new Date();
@@ -261,6 +333,7 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
                   return (
                     <div
                       key={msg.id}
+                      id={`msg-container-${msg.id}`}
                       className={`flex flex-col gap-1 ${isSameGroupNext ? 'mb-1' : 'mb-5'}`}
                     >
                       <Fragment>
@@ -270,6 +343,17 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
                             <div className="bg-gray-100/60 backdrop-blur-sm px-4 py-1.5 rounded-full shadow-[0_0_12px_rgba(0,0,0,0.1)] border-2 border-white/40">
                               <span className="text-[13px] font-bold text-gray-500 tracking-tight">
                                 {getDateLabel(currentDate)}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {isFirstUnread && (
+                          <div ref={firstUnreadRef} className="flex items-center justify-center my-6 sticky z-20">
+                            <div className="bg-amber-100/90 backdrop-blur-sm px-4 py-1.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-amber-200 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                              <span className="text-[12px] font-bold text-amber-800 tracking-tight uppercase">
+                                Tin nhắn chưa đọc
                               </span>
                             </div>
                           </div>
@@ -429,6 +513,42 @@ export default function MessageDetail({ chat, onBack, isMobile }: MessageDetailP
           </div>
         )}
       </motion.div>
+
+      {/* Floating Scroll to Bottom / Unread Badge */}
+      <AnimatePresence>
+        {showScrollDownBtn && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 20 }}
+            className="absolute bottom-24 right-6 z-30"
+          >
+            <button
+              onClick={scrollToBottom}
+              className="relative w-12 h-12 rounded-full bg-white text-gray-700 shadow-[0_4px_16px_rgba(0,0,0,0.15)] border border-gray-100 flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all group"
+            >
+              {/* Chevron Down Icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-gray-600 group-hover:translate-y-0.5 transition-transform"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+
+              {/* Unread badge count below scroll viewport */}
+              {unreadBelowCount > 0 && (
+                <span className="absolute -top-2 -left-2 min-w-[20px] h-[20px] px-1.5 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border border-white shadow-sm animate-pulse">
+                  {unreadBelowCount}
+                </span>
+              )}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
