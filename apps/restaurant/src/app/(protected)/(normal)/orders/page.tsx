@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from '@repo/ui/motion';
 import { useLoading, OrderCardShimmer, HistoryCardShimmer, useSwipeConfirmation, useNotification } from '@repo/ui';
-import { ClipboardList, ChefHat, Bike, Power } from '@repo/ui/icons';
+import { ClipboardList, ChefHat, Bike, Power, Loader2 } from '@repo/ui/icons';
 import type { Order } from '@repo/types';
 import { orderApi } from '@repo/api';
 import OrderCard from '@/components/OrderCard';
@@ -192,16 +192,28 @@ export default function OrdersPage() {
               </h1>
             </div>
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={isStatusUpdating || isStatusLoading ? {} : { scale: 1.02 }}
+              whileTap={isStatusUpdating || isStatusLoading ? {} : { scale: 0.98 }}
               onClick={handleToggleApp}
-              className={`flex items-center gap-2 px-4 py-2.5 md:px-6 md:py-3.5 rounded-2xl font-bold transition-all duration-300 text-sm md:text-base ${isAppActive
-                ? 'bg-primary text-white shadow-md md:shadow-xl md:shadow-primary/30'
-                : 'bg-gray-100 text-gray-500 border-2 border-gray-200'
+              disabled={isStatusUpdating || isStatusLoading}
+              className={`flex items-center gap-2 px-4 py-2.5 md:px-6 md:py-3.5 rounded-2xl font-bold transition-all duration-300 text-sm md:text-base ${isStatusUpdating || isStatusLoading
+                ? 'bg-gray-100 text-gray-400 border-2 border-gray-200 cursor-not-allowed'
+                : isAppActive
+                  ? 'bg-primary text-white shadow-md md:shadow-xl md:shadow-primary/30'
+                  : 'bg-gray-100 text-gray-500 border-2 border-gray-200'
                 }`}
             >
-              <Power className="w-4 h-4 md:w-5 md:h-5" />
-              <span>{isAppActive ? 'Open' : 'Closed'}</span>
+              {isStatusUpdating || isStatusLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <>
+                  <Power className="w-4 h-4 md:w-5 md:h-5" />
+                  <span>{isAppActive ? 'Open' : 'Closed'}</span>
+                </>
+              )}
             </motion.button>
           </div>
         </div>
