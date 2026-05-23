@@ -1,0 +1,150 @@
+"use client";
+
+import { useState } from "react";
+import { type LoginFormData } from "@repo/lib";
+import { motion } from "@repo/ui/motion";
+import { Key, ChevronRight, Eye, EyeOff } from "@repo/ui/icons";
+
+interface MobileLoginDrawerProps {
+  form: any;
+  onSubmit: (data: LoginFormData) => void;
+  onForgotPassword: () => void;
+  isLoading: boolean;
+  error?: string | null;
+}
+
+export default function MobileLoginDrawer({
+  form,
+  onSubmit,
+  onForgotPassword,
+  isLoading,
+  error,
+}: MobileLoginDrawerProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const { register, handleSubmit, formState: { errors, isValid } } = form;
+
+  return (
+    <motion.div
+      key="login-drawer"
+      initial={{ y: "100%" }}
+      animate={{ y: 0 }}
+      exit={{ y: "100%" }}
+      transition={{ type: "spring", damping: 30, stiffness: 150 }}
+      className="relative z-10 w-full bg-white rounded-t-[48px] p-10 flex flex-col shadow-[0_-20px_60px_rgba(0,0,0,0.15)] max-h-[85vh] overflow-y-auto no-scrollbar outline-none"
+    >
+      {/* Drawer Header */}
+      <div className="flex items-center justify-between mb-12">
+        <span className="text-gray-400 font-bold text-sm tracking-tight opacity-60">
+          Manage with Eatzy, Cook easy!
+        </span>
+      </div>
+
+      <div className="mb-10">
+        <h1 className="text-5xl font-black text-gray-900 tracking-tighter leading-none">
+          Log in
+        </h1>
+      </div>
+
+      {/* API Error Message Display */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-100/50 text-red-600 rounded-[24px] text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2 shadow-sm">
+          <div className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+            <span className="text-red-500 font-black text-xs">!</span>
+          </div>
+          <div className="flex justify-center items-center">
+            <p className="font-bold text-red-600 mt-0.5 leading-tight">{error}</p>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Email Capsule */}
+        <div className="space-y-2">
+          <div className="relative">
+            <div className="absolute left-2 top-2 bottom-2 p-4 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 z-10">
+              <span className="font-extrabold text-sm">@</span>
+            </div>
+            <input
+              type="email"
+              placeholder="partner e-mail address"
+              {...register("email")}
+              className="w-full h-[64px] bg-gray-100 border border-transparent focus:border-gray-100 focus:bg-white rounded-full pl-16 pr-4 text-base font-bold text-gray-900 transition-all focus:ring-4 focus:ring-gray-100/50 placeholder:text-gray-300 placeholder:italic"
+            />
+          </div>
+          {errors.email && (
+            <p className="text-[10px] text-red-500 font-bold ml-6 uppercase">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
+
+        {/* Password Capsule */}
+        <div className="space-y-3">
+          <div className="relative">
+            <div className="absolute left-2 top-2 bottom-2 p-4 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 z-10">
+              <Key size={16} strokeWidth={3.0} />
+            </div>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="security password"
+              {...register("password")}
+              className="w-full h-[64px] bg-gray-100 border border-transparent focus:border-gray-100 focus:bg-white rounded-full pl-16 pr-16 text-base font-bold text-gray-900 transition-all focus:ring-4 focus:ring-gray-100/50 placeholder:text-gray-300 placeholder:italic"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full text-gray-400 hover:text-black transition-all active:scale-95 z-10"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="mt-1 text-[10px] text-red-500 font-bold ml-6 uppercase">
+              {errors.password.message}
+            </p>
+          )}
+
+          <div className="flex justify-end px-4">
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="text-[11px] font-bold text-gray-400 hover:text-black transition-all flex items-center gap-1 uppercase tracking-widest group"
+            >
+              <span>Forgot password</span>
+              <ChevronRight size={12} strokeWidth={3} className="transition-transform group-hover:translate-x-1" />
+            </button>
+          </div>
+        </div>
+
+        <div className="pt-6 flex flex-col space-y-8">
+          <p className="text-[10px] text-gray-300 font-medium leading-relaxed max-w-xs ml-2">
+            Eatzy ensures your partner details and operational data are fully protected by advanced encryption systems.
+          </p>
+
+          <div className="space-y-6">
+            <button
+              type="submit"
+              disabled={isLoading || !isValid}
+              className={`w-full h-16 rounded-full font-black text-lg transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98] ${(isLoading || !isValid)
+                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                  : "bg-black text-white hover:bg-zinc-800 shadow-[0_15px_40px_rgba(0,0,0,0.15)]"
+                }`}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  <span className="text-black/60 text-sm">Authenticating...</span>
+                </div>
+              ) : (
+                <>
+                  <span className="tracking-tight">Sign In to Dashboard</span>
+                  <ChevronRight size={20} strokeWidth={3} className={!isValid ? 'opacity-80' : ''} />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </form>
+    </motion.div>
+  );
+}
