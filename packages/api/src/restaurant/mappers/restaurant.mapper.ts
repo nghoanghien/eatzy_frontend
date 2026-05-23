@@ -53,6 +53,13 @@ export function mapBackendRestaurantDetail(dto: BackendRestaurantDetailDTO): Res
   const fiveStarCount = dto.fiveStarCount || 0;
   const reviewCount = oneStarCount + twoStarCount + threeStarCount + fourStarCount + fiveStarCount;
 
+  let commissionRate = dto.commissionRate;
+  if (typeof commissionRate === 'number') {
+    if (commissionRate > 0 && commissionRate < 1.0) {
+      commissionRate = Math.round(commissionRate * 10000) / 100; // handle float representation nicely
+    }
+  }
+
   return {
     id: String(dto.id),
     name: dto.name,
@@ -71,6 +78,7 @@ export function mapBackendRestaurantDetail(dto: BackendRestaurantDetailDTO): Res
     restaurantType: dto.restaurantTypes?.name,
     avatarUrl: dto.avatarUrl,
     coverImageUrl: dto.coverImageUrl,
+    commissionRate,
     oneStarCount,
     twoStarCount,
     threeStarCount,
@@ -90,7 +98,7 @@ export function mapRestaurantDetailToStoreInfo(detail: RestaurantDetail): StoreI
       lng: detail.longitude || 0,
     },
     slug: detail.slug,
-    commissionRate: 10, // Default
+    commissionRate: detail.commissionRate ?? 15, // Default is 15
     phone: detail.contactPhone || '',
     email: '',
     rating: detail.rating,

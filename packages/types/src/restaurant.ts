@@ -189,6 +189,7 @@ export type RestaurantDetail = {
   restaurantType?: string;
   avatarUrl?: string;
   coverImageUrl?: string;
+  commissionRate?: number;
   // Star counts for rating breakdown
   oneStarCount: number;
   twoStarCount: number;

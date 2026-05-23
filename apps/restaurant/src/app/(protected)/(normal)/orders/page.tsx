@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from '@repo/ui/motion';
-import { useLoading, OrderCardShimmer, useSwipeConfirmation, useNotification } from '@repo/ui';
+import { useLoading, OrderCardShimmer, HistoryCardShimmer, useSwipeConfirmation, useNotification } from '@repo/ui';
 import { ClipboardList, ChefHat, Bike, Power } from '@repo/ui/icons';
 import type { Order } from '@repo/types';
 import { orderApi } from '@repo/api';
 import OrderCard from '@/components/OrderCard';
 import OrderDrawer from '@/components/OrderDrawer';
+import MobileOrderDrawer from '@/components/MobileOrderDrawer';
+import { EmptyState } from '@/components/ui/EmptyState';
 import '@repo/ui/styles/scrollbar.css';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -21,6 +23,8 @@ export default function OrdersPage() {
   const { hide } = useLoading();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'pending' | 'inprogress' | 'waiting'>('pending');
+  const [isMobile, setIsMobile] = useState(false);
 
   // Restaurant status management
   const {
@@ -57,6 +61,15 @@ export default function OrdersPage() {
   useEffect(() => {
     hide();
   }, [hide]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleToggleApp = () => {
     const newStatus = !isAppActive;
@@ -163,39 +176,72 @@ export default function OrdersPage() {
   return (
 
     <>
-      <div className="flex flex-col h-full bg-[#F8F9FA]">
+      <div className="flex flex-col h-full bg-[#F7F7F7] md:bg-[#F8F9FA]">
         {/* Header - Premium Design */}
-        <div className="px-8 pt-5 shrink-0">
+        <div className="px-6 pt-4 md:px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="hidden md:flex items-center gap-2 mb-1.5">
                 <span className="px-2.5 py-0.5 rounded-lg bg-lime-100 text-lime-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
                   <ClipboardList size={12} />
                   Live Orders
                 </span>
               </div>
-              <h1 className="text-4xl font-anton text-gray-900 uppercase tracking-tight">
-                {user?.name?.toUpperCase() || "RESTAURANT"}
+              <h1 className="text-2xl md:text-4xl font-anton font-bold text-gray-900 uppercase tracking-tight">
+                CURRENT ORDERS
               </h1>
-              <p className="text-gray-500 font-medium mt-1">Manage incoming orders and kitchen workflow.</p>
             </div>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleToggleApp}
-              className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 ${isAppActive
-                ? 'bg-primary text-white shadow-xl shadow-primary/30'
+              className={`flex items-center gap-2 px-4 py-2.5 md:px-6 md:py-3.5 rounded-2xl font-bold transition-all duration-300 text-sm md:text-base ${isAppActive
+                ? 'bg-primary text-white shadow-md md:shadow-xl md:shadow-primary/30'
                 : 'bg-gray-100 text-gray-500 border-2 border-gray-200'
                 }`}
             >
-              <Power className="w-5 h-5" />
+              <Power className="w-4 h-4 md:w-5 md:h-5" />
               <span>{isAppActive ? 'Open' : 'Closed'}</span>
             </motion.button>
           </div>
         </div>
 
-        {/* 3 Column Layout */}
-        <div className="grid grid-cols-3 gap-0 px-6 py-6 flex-1 min-h-0">
+        {/* Mobile Tab Control */}
+        <div className="md:hidden px-3 pb-2 pt-4 shrink-0">
+          <div className="flex bg-slate-50 rounded-3xl p-1 border-2 border-white shadow-[inset_0_0_20px_rgba(0,0,0,0.09)] relative">
+            <button
+              onClick={() => setMobileTab('pending')}
+              className={`flex-1 py-2.5 text-xs font-semibold rounded-2xl transition-all duration-300 relative z-10 flex items-center justify-center gap-1.5 ${mobileTab === 'pending' ? 'bg-[#1A1A1A] text-white shadow-md' : 'text-gray-400 font-medium'
+                }`}
+            >
+              <span>Pending</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-lg font-sans font-black ${mobileTab === 'pending' ? 'bg-yellow-400 text-black' : 'bg-gray-100 text-gray-500'
+                }`}>{pendingOrders.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setMobileTab('inprogress')}
+              className={`flex-1 py-2.5 text-xs font-semibold rounded-2xl transition-all duration-300 relative z-10 flex items-center justify-center gap-1.5 ${mobileTab === 'inprogress' ? 'bg-[#1A1A1A] text-white shadow-md' : 'text-gray-400 font-medium'
+                }`}
+            >
+              <span>In Progress</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-lg font-sans font-black ${mobileTab === 'inprogress' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-500'
+                }`}>{inProgressOrders.length}</span>
+            </button>
+            <button
+              onClick={() => setMobileTab('waiting')}
+              className={`flex-1 py-2.5 text-xs font-semibold rounded-2xl transition-all duration-300 relative z-10 flex items-center justify-center gap-1.5 ${mobileTab === 'waiting' ? 'bg-[#1A1A1A] text-white shadow-md' : 'text-gray-400 font-medium'
+                }`}
+            >
+              <span>Waiting</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-lg font-sans font-black ${mobileTab === 'waiting' ? 'bg-lime-500 text-white' : 'bg-gray-100 text-gray-500'
+                }`}>{waitingForDriverOrders.length}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop 3 Column Layout */}
+        <div className="hidden md:grid grid-cols-3 gap-0 px-6 py-6 flex-1 min-h-0">
           {/* Column 1: Pending Confirmation */}
           <div className="flex flex-col h-full min-h-0 px-3">
             <div className="mb-5 flex items-center justify-center gap-3 flex-shrink-0">
@@ -224,12 +270,12 @@ export default function OrdersPage() {
                       ))}
                     </AnimatePresence>
                     {pendingOrders.length === 0 && (
-                      <div className="h-full flex items-center justify-center">
-                        <div className="text-center text-gray-400 mt-36">
-                          <ClipboardList className="w-16 h-16 mx-auto mb-2 opacity-30" />
-                          <div className="text-sm">No new orders</div>
-                        </div>
-                      </div>
+                      <EmptyState
+                        icon={ClipboardList}
+                        title="No pending orders"
+                        description="New orders from customers will appear here for confirmation."
+                        className="py-16 md:py-24"
+                      />
                     )}
                   </>
                 )}
@@ -265,12 +311,12 @@ export default function OrdersPage() {
                       ))}
                     </AnimatePresence>
                     {inProgressOrders.length === 0 && (
-                      <div className="h-full flex items-center justify-center">
-                        <div className="text-center text-gray-400 mt-36">
-                          <ChefHat className="w-16 h-16 mx-auto mb-2 opacity-30" />
-                          <div className="text-sm">No orders in progress</div>
-                        </div>
-                      </div>
+                      <EmptyState
+                        icon={ChefHat}
+                        title="No orders in progress"
+                        description="Orders you have confirmed and are currently preparing."
+                        className="py-16 md:py-24"
+                      />
                     )}
                   </>
                 )}
@@ -306,12 +352,12 @@ export default function OrdersPage() {
                       ))}
                     </AnimatePresence>
                     {waitingForDriverOrders.length === 0 && (
-                      <div className="h-full flex items-center justify-center">
-                        <div className="text-center text-gray-400 mt-36">
-                          <Bike className="w-16 h-16 mx-auto mb-2 opacity-30" />
-                          <div className="text-sm">No orders waiting for driver</div>
-                        </div>
-                      </div>
+                      <EmptyState
+                        icon={Bike}
+                        title="No orders waiting"
+                        description="Orders prepared and waiting for driver pickup."
+                        className="py-16 md:py-24"
+                      />
                     )}
                   </>
                 )}
@@ -319,18 +365,123 @@ export default function OrdersPage() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Single Column Layout */}
+        <div className="flex md:hidden flex-col flex-1 min-h-0 px-3 py-3 overflow-y-auto">
+          {mobileTab === 'pending' && (
+            <div className="flex flex-col h-full min-h-0">
+              <div className="flex-grow space-y-4 py-2 px-1">
+                {showLoading ? (
+                  <HistoryCardShimmer cardCount={2} />
+                ) : (
+                  <>
+                    <AnimatePresence mode="popLayout">
+                      {pendingOrders.map((order) => (
+                        <OrderCard
+                          key={order.id}
+                          order={order}
+                          onClick={() => handleOpenOrder(order)}
+                        />
+                      ))}
+                    </AnimatePresence>
+                    {pendingOrders.length === 0 && (
+                      <EmptyState
+                        icon={ClipboardList}
+                        title="No pending orders"
+                        description="New orders from customers will appear here for confirmation."
+                        className="py-16"
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {mobileTab === 'inprogress' && (
+            <div className="flex flex-col h-full min-h-0">
+              <div className="flex-grow space-y-4 py-2 px-1">
+                {showLoading ? (
+                  <HistoryCardShimmer cardCount={2} />
+                ) : (
+                  <>
+                    <AnimatePresence mode="popLayout">
+                      {inProgressOrders.map((order) => (
+                        <OrderCard
+                          key={order.id}
+                          order={order}
+                          onClick={() => handleOpenOrder(order)}
+                        />
+                      ))}
+                    </AnimatePresence>
+                    {inProgressOrders.length === 0 && (
+                      <EmptyState
+                        icon={ChefHat}
+                        title="No orders in progress"
+                        description="Orders you have confirmed and are currently preparing."
+                        className="py-16"
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {mobileTab === 'waiting' && (
+            <div className="flex flex-col h-full min-h-0">
+              <div className="flex-grow space-y-4 py-2 px-1">
+                {showLoading ? (
+                  <HistoryCardShimmer cardCount={2} />
+                ) : (
+                  <>
+                    <AnimatePresence mode="popLayout">
+                      {waitingForDriverOrders.map((order) => (
+                        <OrderCard
+                          key={order.id}
+                          order={order}
+                          onClick={() => handleOpenOrder(order)}
+                        />
+                      ))}
+                    </AnimatePresence>
+                    {waitingForDriverOrders.length === 0 && (
+                      <EmptyState
+                        icon={Bike}
+                        title="No orders waiting"
+                        description="Orders prepared and waiting for driver pickup."
+                        className="py-16"
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Order Detail Drawer with AnimatePresence */}
-      <OrderDrawer
-        open={drawerOpen}
-        order={selectedOrder}
-        onClose={handleCloseDrawer}
-        onConfirm={handleConfirmOrder}
-        onReject={handleRejectOrder}
-        onComplete={handleCompleteOrder}
-        loading={isActionLoading}
-      />
+      {isMobile ? (
+        <MobileOrderDrawer
+          open={drawerOpen}
+          order={selectedOrder}
+          onClose={handleCloseDrawer}
+          onConfirm={handleConfirmOrder}
+          onReject={handleRejectOrder}
+          onComplete={handleCompleteOrder}
+          loading={isActionLoading}
+        />
+      ) : (
+        <OrderDrawer
+          open={drawerOpen}
+          order={selectedOrder}
+          onClose={handleCloseDrawer}
+          onConfirm={handleConfirmOrder}
+          onReject={handleRejectOrder}
+          onComplete={handleCompleteOrder}
+          loading={isActionLoading}
+        />
+      )}
     </>
   );
 }

@@ -17,6 +17,7 @@ import {
   BarChart3,
 } from '@repo/ui/icons';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
+import BottomNav from '../../../components/BottomNav';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation } from '@repo/ui';
 import { useAuth } from '../../../features/auth/hooks/useAuth';
 import { useLogout } from '../../../features/auth/hooks/useLogout';
@@ -78,9 +79,9 @@ function RestaurantLayoutContent({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-[#F7F7F7] md:bg-gray-50">
       <div
-        className={`nav-container liquid-glass-container flex rounded-3xl flex-col transition-all duration-500 ease-out backdrop-blur-sm shadow-2xl ${navHovered ? "w-72 bottom-6 top-6" : "w-20 bottom-24 top-24"
+        className={`nav-container liquid-glass-container hidden md:flex rounded-3xl flex-col transition-all duration-500 ease-out backdrop-blur-sm shadow-2xl ${navHovered ? "w-72 bottom-6 top-6" : "w-20 bottom-24 top-24"
           } fixed left-6 z-50 overflow-hidden`}
         style={{
           background: navHovered
@@ -243,9 +244,10 @@ function RestaurantLayoutContent({ children }: { children: ReactNode }) {
         </div>
       </div >
 
-      <div className="flex-1 ml-28 flex flex-col overflow-x-hidden max-w-full">
+      <div className="flex-1 ml-0 md:ml-28 pb-28 md:pb-0 flex flex-col overflow-x-hidden max-w-full">
         {/* Header Removed */}
         <div className="flex-1 overflow-x-hidden max-w-full">{children}</div>
+        <BottomNav />
       </div>
     </div >
   );

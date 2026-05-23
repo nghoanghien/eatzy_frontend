@@ -7,8 +7,6 @@ export { default as StoreGeneralInfoEdit } from './components/StoreGeneralInfoEd
 export { default as StoreLocation } from './components/StoreLocation';
 export { default as StoreLocationEdit } from './components/StoreLocationEdit';
 export { default as StoreLocationMap } from './components/StoreLocationMap';
-export { default as StoreMedia } from './components/StoreMedia';
-export { default as StoreMediaEdit } from './components/StoreMediaEdit';
 export { default as StoreSchedule } from './components/StoreSchedule';
 export { default as StoreScheduleEdit } from './components/StoreScheduleEdit';
 export { default as StoreSkeleton } from './components/StoreSkeleton';
@@ -21,6 +19,7 @@ export {
   useMyStore,
   useUpdateStore,
   useUploadStoreImage,
+  useRestaurantCommission,
   restaurantStatusKeys,
   reviewKeys,
   storeKeys,
@@ -30,7 +29,10 @@ export type {
   RestaurantStatus,
   UseRestaurantStatusResult,
   UseMyRestaurantReviewsResult,
+} from './hooks';
+
+export type {
   StoreInfo,
   OpeningHour,
   UpdateStoreRequest,
-} from './hooks';
+} from '@repo/types';
