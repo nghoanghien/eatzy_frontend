@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from '@repo/ui/motion';
-import { ImageWithFallback, useSwipeConfirmation, useNotification } from '@repo/ui';
+import { ImageWithFallback, useSwipeConfirmation } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 import { Dish, MenuCategory } from '@repo/types';
 import { Camera, Save, ChevronDown } from '@repo/ui/icons';
 
@@ -20,7 +21,6 @@ interface DishInfoCardProps {
 
 export default function DishInfoCard({ dish, originalDish, onUpdate, onDraftChange, onClose, mode = 'edit', categories, layoutId, isSaving }: DishInfoCardProps) {
   const { confirm } = useSwipeConfirmation();
-  const { showNotification } = useNotification();
   const [isCatOpen, setIsCatOpen] = useState(false);
 
   // Helper to update draft
@@ -59,12 +59,12 @@ export default function DishInfoCard({ dish, originalDish, onUpdate, onDraftChan
   const handleSaveDetails = () => {
     const error = validate();
     if (error) {
-      showNotification({ message: error, type: 'error' });
+      sileo.error({ title: error });
       return;
     }
 
     if (!hasChanges()) {
-      showNotification({ message: 'Không có thay đổi nào để lưu', type: 'error', format: "Kiểm tra lại thông tin và thử lại!" });
+      sileo.error({ title: 'Không có thay đổi nào để lưu', description: "Kiểm tra lại thông tin và thử lại!" });
       return;
     }
 

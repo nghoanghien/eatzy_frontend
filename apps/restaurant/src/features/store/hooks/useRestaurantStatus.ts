@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { restaurantApi } from "@repo/api";
-import { useNotification } from "@repo/ui";
+import { sileo } from "@/components/DynamicIslandToast";
 
 // ======== Types ========
 
@@ -45,7 +45,6 @@ export const restaurantStatusKeys = {
  */
 export function useRestaurantStatus(): UseRestaurantStatusResult {
   const queryClient = useQueryClient();
-  const { showNotification } = useNotification();
 
   // Query for fetching current status
   const query = useQuery({
@@ -72,19 +71,15 @@ export function useRestaurantStatus(): UseRestaurantStatusResult {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: restaurantStatusKeys.all });
-      showNotification({
-        message: "Restaurant Opened Successfully!",
-        type: "success",
-        format: "The restaurant is now open and ready to receive new orders!",
-        autoHideDuration: 3000,
+      sileo.success({
+        title: "Restaurant Opened!",
+        description: "Now open and ready to receive new orders!",
       });
     },
     onError: (error: Error) => {
-      showNotification({
-        message: "Unable to open restaurant",
-        type: "error",
-        format: error.message,
-        autoHideDuration: 3000,
+      sileo.error({
+        title: "Unable to open restaurant",
+        description: error.message,
       });
     },
   });
@@ -100,19 +95,15 @@ export function useRestaurantStatus(): UseRestaurantStatusResult {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: restaurantStatusKeys.all });
-      showNotification({
-        message: "Restaurant Temporarily Closed",
-        type: "success",
-        format: "The restaurant has been closed. You will not receive any new orders.",
-        autoHideDuration: 3000,
+      sileo.success({
+        title: "Restaurant Closed",
+        description: "You will not receive any new orders.",
       });
     },
     onError: (error: Error) => {
-      showNotification({
-        message: "Unable to close restaurant",
-        type: "error",
-        format: error.message,
-        autoHideDuration: 3000,
+      sileo.error({
+        title: "Unable to close restaurant",
+        description: error.message,
       });
     },
   });

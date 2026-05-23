@@ -33,12 +33,14 @@ const restaurantMenuItems = [
 ];
 
 import { NormalLoadingProvider, useNormalLoading, NormalLoadingOverlay } from './context/NormalLoadingContext';
+import { useMobileExitGuard } from '../../../hooks/useMobileExitGuard';
 
 function RestaurantLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { confirm } = useSwipeConfirmation();
   const { startLoading } = useNormalLoading();
+  useMobileExitGuard();
   const [activeSection, setActiveSection] = useState('orders');
   const [navHovered, setNavHovered] = useState(false);
   const { user, isLoading: isAuthLoading } = useAuth();

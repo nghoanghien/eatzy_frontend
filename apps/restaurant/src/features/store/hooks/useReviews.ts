@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { reviewApi, ReviewDTO } from '@repo/api';
-import { useNotification } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 
 // ======== Query Keys ========
 
@@ -88,7 +88,6 @@ export function useMyRestaurantReviews(): UseMyRestaurantReviewsResult {
  */
 export function useReplyToReview() {
   const queryClient = useQueryClient();
-  const { showNotification } = useNotification();
 
   const mutation = useMutation({
     mutationFn: async ({ reviewId, reply }: { reviewId: number; reply: string }) => {
@@ -100,18 +99,14 @@ export function useReplyToReview() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.all });
-      showNotification({
-        message: 'Reply sent successfully!',
-        type: 'success',
-        autoHideDuration: 3000,
+      sileo.success({
+        title: 'Reply sent successfully!',
       });
     },
     onError: (error: Error) => {
-      showNotification({
-        message: 'Unable to send reply',
-        type: 'error',
-        format: error.message,
-        autoHideDuration: 3000,
+      sileo.error({
+        title: 'Unable to send reply',
+        description: error.message,
       });
     },
   });

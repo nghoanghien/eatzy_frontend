@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from '@repo/ui/motion';
-import { useNotification } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 
 import ReportHeader, { ReportTab } from '@/features/reports/components/ReportHeader';
 import DashboardReport from '@/features/reports/components/DashboardReport';
@@ -22,7 +22,6 @@ import {
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<ReportTab>('dashboard');
-  const { showNotification } = useNotification();
 
   // Date range management with hydration safety
   const {
@@ -72,9 +71,8 @@ export default function ReportsPage() {
   })();
 
   const handleExport = (type: 'excel' | 'pdf') => {
-    showNotification({
-      message: `Đang xuất báo cáo ${activeTab === 'dashboard' ? 'tổng quan' : activeTab} sang ${type.toUpperCase()}...`,
-      type: 'success',
+    sileo.success({
+      title: `Đang xuất báo cáo ${activeTab === 'dashboard' ? 'tổng quan' : activeTab} sang ${type.toUpperCase()}...`,
     });
     // TODO: Integrate with actual export API
   };

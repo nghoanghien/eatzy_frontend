@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { restaurantDetailApi, mapRestaurantDetailToStoreInfo, mapStoreUpdatesToApi, fileApi } from '@repo/api';
 import type { StoreInfo, UpdateStoreRequest } from '@repo/types';
-import { useNotification } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 
 // ======== Query Keys ========
 
@@ -49,7 +49,6 @@ export function useMyStore() {
  */
 export function useUpdateStore() {
   const queryClient = useQueryClient();
-  const { showNotification } = useNotification();
 
   const mutation = useMutation({
     mutationFn: async (updates: Record<string, any>) => {
@@ -62,19 +61,15 @@ export function useUpdateStore() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: storeKeys.all });
-      showNotification({
-        message: 'Store information updated!',
-        type: 'success',
-        format: 'Data has been updated successfully.',
-        autoHideDuration: 3000,
+      sileo.success({
+        title: 'Store information updated!',
+        description: 'Data has been updated successfully.',
       });
     },
     onError: (error: Error) => {
-      showNotification({
-        message: 'Unable to update information',
-        type: 'error',
-        format: error.message,
-        autoHideDuration: 3000,
+      sileo.error({
+        title: 'Unable to update information',
+        description: error.message,
       });
     },
   });
@@ -91,7 +86,6 @@ export function useUpdateStore() {
  */
 export function useUploadStoreImage() {
   const queryClient = useQueryClient();
-  const { showNotification } = useNotification();
 
   const mutation = useMutation({
     mutationFn: async ({ file, folder }: { file: File; folder?: string }) => {
@@ -102,18 +96,14 @@ export function useUploadStoreImage() {
       return response.data;
     },
     onSuccess: () => {
-      showNotification({
-        message: 'Image uploaded successfully!',
-        type: 'success',
-        autoHideDuration: 3000,
+      sileo.success({
+        title: 'Image uploaded successfully!',
       });
     },
     onError: (error: Error) => {
-      showNotification({
-        message: 'Unable to upload image',
-        type: 'error',
-        format: error.message,
-        autoHideDuration: 3000,
+      sileo.error({
+        title: 'Unable to upload image',
+        description: error.message,
       });
     },
   });

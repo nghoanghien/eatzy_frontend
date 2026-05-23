@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dishApi, restaurantDetailApi } from '@repo/api';
 import type { Dish, MenuCategory } from '@repo/types';
-import { useNotification } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 import { useMemo, useCallback } from 'react';
 
 // ======== Types ========
@@ -70,7 +70,6 @@ export function useMyRestaurantMenu(
 ): UseMyRestaurantMenuResult {
   const { enabled = true, showNotifications = true } = options;
   const queryClient = useQueryClient();
-  const { showNotification } = useNotification();
 
   const queryKey = myRestaurantMenuKeys.menu();
 
@@ -131,12 +130,12 @@ export function useMyRestaurantMenu(
     onSuccess: () => {
       invalidateMenu();
       if (showNotifications) {
-        showNotification({ message: 'Đã thêm món mới thành công!', type: 'success' });
+        sileo.success({ title: 'Đã thêm món mới thành công!' });
       }
     },
     onError: (error: Error) => {
       if (showNotifications) {
-        showNotification({ message: 'Thao tác thất bại', type: 'error', format: error.message });
+        sileo.error({ title: 'Thao tác thất bại', description: error.message });
       }
     },
   });
@@ -153,12 +152,12 @@ export function useMyRestaurantMenu(
     onSuccess: () => {
       invalidateMenu();
       if (showNotifications) {
-        showNotification({ message: 'Đã cập nhật món ăn thành công!', type: 'success', format: 'Đã cập nhật món ăn thành công!' });
+        sileo.success({ title: 'Đã cập nhật món ăn thành công!' });
       }
     },
     onError: (error: Error) => {
       if (showNotifications) {
-        showNotification({ message: 'Thao tác thất bại', type: 'error', format: error.message });
+        sileo.error({ title: 'Thao tác thất bại', description: error.message });
       }
     },
   });
@@ -174,12 +173,12 @@ export function useMyRestaurantMenu(
     onSuccess: () => {
       invalidateMenu();
       if (showNotifications) {
-        showNotification({ message: 'Đã xóa món ăn!', type: 'success', format: 'Đã xóa món ăn!' });
+        sileo.success({ title: 'Đã xóa món ăn!' });
       }
     },
     onError: (error: Error) => {
       if (showNotifications) {
-        showNotification({ message: 'Thao tác thất bại', type: 'error', format: error.message });
+        sileo.error({ title: 'Thao tác thất bại', description: error.message });
       }
     },
   });

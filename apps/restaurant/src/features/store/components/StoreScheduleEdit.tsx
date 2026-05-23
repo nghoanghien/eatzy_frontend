@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { Clock, X, Save, Trash2, Plus, Check } from "@repo/ui/icons";
-import { TimeInput, useNotification, useSwipeConfirmation } from "@repo/ui";
+import { TimeInput, useSwipeConfirmation } from "@repo/ui";
+import { sileo } from "@/components/DynamicIslandToast";
 import { parseTimeToMinutes, formatMinutesToTime } from "@repo/lib";
 
 interface DaySchedule {
@@ -59,7 +60,6 @@ export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: 
   const [hoveredShiftRange, setHoveredShiftRange] = useState<{ start: string, end: string } | null>(null);
 
   const [conflictShifts, setConflictShifts] = useState<{ dayIndex: number, shiftIndex: number }[]>([]);
-  const { showNotification } = useNotification();
   const { confirm } = useSwipeConfirmation();
 
   // Store initial state for comparison
@@ -199,11 +199,9 @@ export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: 
   const handleGlobalSave = () => {
     const currentJson = JSON.stringify(openingHours);
     if (currentJson === initialJson) {
-      showNotification({
-        type: 'error',
-        message: 'No changes made!',
-        format: 'Check your changes and try again!',
-        autoHideDuration: 3000
+      sileo.error({
+        title: 'No changes made!',
+        description: 'Check your changes and try again!',
       });
       return;
     }
@@ -359,11 +357,9 @@ export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: 
       // Handle collision
       const newConflicts = [...conflicts, currentShiftIndex].map(idx => ({ dayIndex, shiftIndex: idx }));
       setConflictShifts(newConflicts);
-      showNotification({
-        type: 'error',
-        message: 'Oops! Overlapping schedule detected!',
-        format: 'Please check other schedules and adjust accordingly.',
-        autoHideDuration: 3000
+      sileo.error({
+        title: 'Oops! Overlapping schedule detected!',
+        description: 'Please check other schedules and adjust accordingly.',
       });
 
       // Clear conflict state after animation

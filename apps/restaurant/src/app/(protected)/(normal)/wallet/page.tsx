@@ -5,12 +5,11 @@ import WalletStatsCards from '@/features/wallet/components/WalletStatsCards';
 import WalletTransactionTable from '@/features/wallet/components/WalletTransactionTable';
 import WalletBankInfo from '@/features/wallet/components/WalletBankInfo';
 import WithdrawModal from '@/features/wallet/components/WithdrawModal';
-import { useNotification } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 import { ChevronLeft, ChevronRight, Wallet } from '@repo/ui/icons';
 import { useMyWallet, useWalletTransactions, type WalletSearchFields } from '@/features/wallet/hooks';
 
 export default function WalletPage() {
-  const { showNotification } = useNotification();
   const [mounted, setMounted] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -86,12 +85,13 @@ export default function WalletPage() {
   };
 
   const handleWithdrawConfirm = (amount: number) => {
-    showNotification({
-      message: `Withdrawal of ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)} initiated!`,
-      type: 'success',
-      format: 'Your funds are on the way.'
+    sileo.success({
+      title: `Withdrawal of ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)} initiated!`,
+      description: 'Your funds are on the way.'
     });
   };
+
+
 
   // Handle search field change
   const handleSearchChange = (key: string, value: string) => {

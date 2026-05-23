@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ImageWithFallback, useLoading, useNotification } from "@repo/ui";
+import { ImageWithFallback, useLoading } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
@@ -9,12 +9,14 @@ import { motion, AnimatePresence } from "@repo/ui/motion";
 import { Key } from "@repo/ui/icons";
 import PartnerLoginForm from "@/features/auth/components/PartnerLoginForm";
 import MobileLoginDrawer from "@/components/auth/MobileLoginDrawer";
+import { useMobileExitGuard } from "@/hooks/useMobileExitGuard";
+import { sileo } from "@/components/DynamicIslandToast";
 
 export default function LoginPageContent() {
   const router = useRouter();
   const { show, hide } = useLoading();
-  const { showNotification } = useNotification();
   const { handleLogin, isLoading, error } = useLogin();
+  useMobileExitGuard();
 
   const [isDesktop, setIsDesktop] = useState<boolean>(true);
 
@@ -44,11 +46,9 @@ export default function LoginPageContent() {
   const onSubmit = async (data: LoginFormData) => {
     const success = await handleLogin(data);
     if (success) {
-      showNotification({
-        message: "Đăng nhập thành công!",
-        type: "success",
-        format: "Đang chuyển hướng về trang quản lý...",
-        autoHideDuration: 3000
+      sileo.success({
+        title: "Đăng nhập thành công!",
+        description: "Đang chuyển hướng về trang quản lý...",
       });
       show("Đang chuyển hướng về trang quản lý...");
       router.push("/orders");

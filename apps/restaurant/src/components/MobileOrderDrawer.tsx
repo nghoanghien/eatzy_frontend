@@ -9,6 +9,7 @@ import { useSwipeConfirmation } from "@repo/ui";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useRestaurantCommission } from "@/features/store";
+import { useMobileBackHandler } from "@/hooks/useMobileBackHandler";
 
 interface MobileOrderDrawerProps {
   open: boolean;
@@ -41,6 +42,9 @@ export default function MobileOrderDrawer({
   const { confirm } = useSwipeConfirmation();
   const [showRejectReasons, setShowRejectReasons] = useState(false);
   const { commissionRate } = useRestaurantCommission();
+
+  // Close drawer when user presses back button on mobile
+  useMobileBackHandler(open, onClose);
 
   if (!order) return null;
 

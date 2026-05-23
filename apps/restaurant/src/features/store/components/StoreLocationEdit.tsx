@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "@repo/ui/motion";
 import { MapPin, X, Save, Navigation, Edit2 } from "@repo/ui/icons";
-import { useNotification, useSwipeConfirmation } from "@repo/ui";
+import { useSwipeConfirmation } from "@repo/ui";
+import { sileo } from "@/components/DynamicIslandToast";
 import StoreLocationMap from "./StoreLocationMap";
 
 interface StoreLocationEditProps {
@@ -14,7 +15,6 @@ interface StoreLocationEditProps {
 export default function StoreLocationEdit({ store, onSave, onClose, layoutId }: StoreLocationEditProps) {
   const [address, setAddress] = useState(store.address);
   const [coords, setCoords] = useState(store.coords);
-  const { showNotification } = useNotification();
   const { confirm } = useSwipeConfirmation();
 
   const handleSave = () => {
@@ -25,11 +25,9 @@ export default function StoreLocationEdit({ store, onSave, onClose, layoutId }: 
     }
 
     if (Object.keys(updates).length === 0) {
-      showNotification({
-        type: 'error',
-        message: 'No changes made!',
-        format: 'Check your changes and try again!',
-        autoHideDuration: 3000
+      sileo.error({
+        title: 'No changes made!',
+        description: 'Check your changes and try again!',
       });
       return;
     }

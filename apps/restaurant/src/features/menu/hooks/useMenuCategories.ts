@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { menuCategoryApi } from '@repo/api';
 import type { MenuCategory } from '@repo/types';
-import { useNotification } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 import { useCallback } from 'react';
 import { myRestaurantMenuKeys } from './useMenu';
 
@@ -45,7 +45,6 @@ export function useMenuCategories(
 ): UseMenuCategoriesResult {
   const { showNotifications = true } = options;
   const queryClient = useQueryClient();
-  const { showNotification } = useNotification();
 
   const queryKey = myRestaurantMenuKeys.menu();
 
@@ -73,12 +72,12 @@ export function useMenuCategories(
     onSuccess: () => {
       invalidateMenu();
       if (showNotifications) {
-        showNotification({ message: 'Đã thêm danh mục mới!', type: 'success' });
+        sileo.success({ title: 'Đã thêm danh mục mới!' });
       }
     },
     onError: (error: Error) => {
       if (showNotifications) {
-        showNotification({ message: 'Cập nhật thất bại', type: 'error', format: error.message });
+        sileo.error({ title: 'Cập nhật thất bại', description: error.message });
       }
     },
   });
@@ -100,12 +99,12 @@ export function useMenuCategories(
     onSuccess: () => {
       invalidateMenu();
       if (showNotifications) {
-        showNotification({ message: 'Đã cập nhật danh mục!', type: 'success' });
+        sileo.success({ title: 'Đã cập nhật danh mục!' });
       }
     },
     onError: (error: Error) => {
       if (showNotifications) {
-        showNotification({ message: 'Cập nhật thất bại', type: 'error', format: error.message });
+        sileo.error({ title: 'Cập nhật thất bại', description: error.message });
       }
     },
   });
@@ -121,12 +120,12 @@ export function useMenuCategories(
     onSuccess: () => {
       invalidateMenu();
       if (showNotifications) {
-        showNotification({ message: 'Đã xóa danh mục!', type: 'success' });
+        sileo.success({ title: 'Đã xóa danh mục!' });
       }
     },
     onError: (error: Error) => {
       if (showNotifications) {
-        showNotification({ message: 'Cập nhật thất bại', type: 'error', format: error.message });
+        sileo.error({ title: 'Cập nhật thất bại', description: error.message });
       }
     },
   });
@@ -165,12 +164,12 @@ export function useMenuCategories(
     onSuccess: () => {
       invalidateMenu();
       if (showNotifications) {
-        showNotification({ message: 'Cập nhật danh mục thành công!', type: 'success' });
+        sileo.success({ title: 'Cập nhật danh mục thành công!' });
       }
     },
     onError: (error: Error) => {
       if (showNotifications) {
-        showNotification({ message: 'Cập nhật thất bại', type: 'error', format: error.message });
+        sileo.error({ title: 'Cập nhật thất bại', description: error.message });
       }
     },
   });

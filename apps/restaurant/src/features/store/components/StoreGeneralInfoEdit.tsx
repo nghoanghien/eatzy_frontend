@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "@repo/ui/motion";
 import { FileText, X, Save, Edit2 } from "@repo/ui/icons";
-import { useNotification, useSwipeConfirmation } from "@repo/ui";
+import { useSwipeConfirmation } from "@repo/ui";
+import { sileo } from "@/components/DynamicIslandToast";
 
 interface StoreGeneralInfoEditProps {
   store: { name: string; description: string; phone: string; email: string;[key: string]: unknown };
@@ -17,7 +18,6 @@ export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId 
     phone: store.phone || '',
     email: store.email || ''
   });
-  const { showNotification } = useNotification();
   const { confirm } = useSwipeConfirmation();
 
   const handleChange = (field: string, value: string | number) => {
@@ -33,11 +33,9 @@ export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId 
     if (formData.email !== (store.email || '')) updates.email = formData.email;
 
     if (Object.keys(updates).length === 0) {
-      showNotification({
-        type: 'error',
-        message: 'Bạn chưa thực hiện thay đổi nào!',
-        format: 'Kiểm tra lại các thay đổi và thử lại!',
-        autoHideDuration: 3000
+      sileo.error({
+        title: 'Bạn chưa thực hiện thay đổi nào!',
+        description: 'Kiểm tra lại các thay đổi và thử lại!',
       });
       return;
     }

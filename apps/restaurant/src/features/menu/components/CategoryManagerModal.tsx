@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Reorder } from '@repo/ui/motion';
 import { MenuCategory } from '@repo/types';
 import { Plus, Trash2, GripVertical, Save, X, RotateCcw } from '@repo/ui/icons';
-import { useSwipeConfirmation, useNotification } from '@repo/ui';
+import { useSwipeConfirmation } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 
 interface CategoryManagerModalProps {
   categories: MenuCategory[];
@@ -15,7 +16,6 @@ interface CategoryManagerModalProps {
 
 export default function CategoryManagerModal({ categories, onUpdate, onClose, isSaving }: CategoryManagerModalProps) {
   const { confirm } = useSwipeConfirmation();
-  const { showNotification } = useNotification();
 
   const [localCategories, setLocalCategories] = useState<MenuCategory[]>(categories);
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
@@ -77,7 +77,7 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
 
   const handleSave = () => {
     if (!hasChanges()) {
-      showNotification({ message: 'Không có thay đổi nào để lưu', type: 'error', format: "Kiểm tra lại thông tin và thử lại!" });
+      sileo.error({ title: 'Không có thay đổi nào để lưu', description: "Kiểm tra lại thông tin và thử lại!" });
       return;
     }
 

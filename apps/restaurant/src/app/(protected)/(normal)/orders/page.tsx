@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from '@repo/ui/motion';
-import { useLoading, OrderCardShimmer, HistoryCardShimmer, useSwipeConfirmation, useNotification } from '@repo/ui';
+import { useLoading, OrderCardShimmer, HistoryCardShimmer, useSwipeConfirmation } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 import { ClipboardList, ChefHat, Bike, Power, Loader2 } from '@repo/ui/icons';
 import type { Order } from '@repo/types';
 import { orderApi } from '@repo/api';
@@ -19,7 +20,6 @@ import { useRestaurantStatus } from '@/features/store/hooks/useRestaurantStatus'
 export default function OrdersPage() {
   const { user } = useAuth();
   const { confirm } = useSwipeConfirmation();
-  const { showNotification } = useNotification();
   const { hide } = useLoading();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -97,27 +97,24 @@ export default function OrdersPage() {
     // Don't clear selectedOrder immediately, let AnimatePresence handle exit
     setTimeout(() => setSelectedOrder(null), 300);
   };
-
   const handleConfirmOrder = async (orderId: string) => {
     try {
       const response = await acceptOrder(orderId);
 
       if (response.statusCode === 200) {
-        showNotification({
-          message: 'Order confirmed!',
-          type: 'success',
-          autoHideDuration: 3000
+        sileo.success({
+          title: 'Order confirmed!',
+          description: 'Order is now in progress',
+          actionType: 'order_confirm_success',
         });
         handleCloseDrawer();
       } else {
         throw new Error(response.message || 'Failed to confirm order');
       }
     } catch (error: any) {
-      showNotification({
-        message: 'Order confirmation error',
-        format: error?.message || 'Please check your connection or try again later.',
-        type: 'error',
-        autoHideDuration: 5000
+      sileo.error({
+        title: 'Order confirmation error',
+        description: error?.message || 'Please check your connection or try again later.',
       });
     }
   };
@@ -127,21 +124,19 @@ export default function OrdersPage() {
       const response = await rejectOrder(orderId, reason);
 
       if (response.statusCode === 200) {
-        showNotification({
-          message: 'Order rejected!',
-          type: 'success',
-          autoHideDuration: 3000
+        sileo.success({
+          title: 'Order rejected!',
+          description: 'Order has been cancelled',
+          actionType: 'order_reject_success',
         });
         handleCloseDrawer();
       } else {
         throw new Error(response.message || 'Failed to reject order');
       }
     } catch (error: any) {
-      showNotification({
-        message: 'Order rejection error',
-        format: error?.message || 'Please check your connection or try again later.',
-        type: 'error',
-        autoHideDuration: 5000
+      sileo.error({
+        title: 'Order rejection error',
+        description: error?.message || 'Please check your connection or try again later.',
       });
     }
   };
@@ -151,21 +146,18 @@ export default function OrdersPage() {
       const response = await markAsReady(orderId);
 
       if (response.statusCode === 200) {
-        showNotification({
-          message: 'Order is ready for delivery!',
-          type: 'success',
-          autoHideDuration: 3000
+        sileo.success({
+          title: 'Order is ready!',
+          description: 'Ready for delivery/pickup',
         });
         handleCloseDrawer();
       } else {
         throw new Error(response.message || 'Failed to complete order');
       }
     } catch (error: any) {
-      showNotification({
-        message: 'Order status error',
-        format: error?.message || 'Please check your connection or try again later.',
-        type: 'error',
-        autoHideDuration: 5000
+      sileo.error({
+        title: 'Order status error',
+        description: error?.message || 'Please check your connection or try again later.',
       });
     }
   };

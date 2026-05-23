@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from '@repo/ui/motion';
-import { ImageWithFallback, useLoading, useHoverHighlight, HoverHighlightOverlay, useSwipeConfirmation, useNotification, RestaurantMenuShimmer } from '@repo/ui';
+import { ImageWithFallback, useLoading, useHoverHighlight, HoverHighlightOverlay, useSwipeConfirmation, RestaurantMenuShimmer } from '@repo/ui';
+import { sileo } from '@/components/DynamicIslandToast';
 import { Dish, MenuCategory } from '@repo/types';
 import { Edit2, Search, Plus, Settings, Trash2 } from '@repo/ui/icons';
 import DishInfoCard from '@/features/menu/components/DishInfoCard';
@@ -14,7 +15,6 @@ import { useMyRestaurantMenu, useMenuCategories } from '@/features/menu/hooks/us
 export default function MenuPage() {
   const { hide } = useLoading();
   const { confirm } = useSwipeConfirmation();
-  const { showNotification } = useNotification();
 
   // ======== API Data Hook ========
   // Uses my-restaurant API - no restaurant ID needed
