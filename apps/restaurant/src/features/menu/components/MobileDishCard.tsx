@@ -62,7 +62,6 @@ export default function MobileDishCard({
           <div className="space-y-0.5">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 mb-1 text-gray-400">
-                <ChefHat className={`w-3 h-3 text-[var(--primary)] ${isOutOfStock ? 'grayscale' : ''}`} />
                 <span className="text-[8px] font-black uppercase tracking-widest leading-none">Dish</span>
               </div>
               <h4 className={`font-bold text-gray-700 text-base md:text-lg truncate leading-tight tracking-tight ${isOutOfStock ? 'opacity-60' : ''}`}>

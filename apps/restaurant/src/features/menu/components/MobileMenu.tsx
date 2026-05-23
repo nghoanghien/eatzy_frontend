@@ -293,7 +293,7 @@ export default function MobileMenu({
               >
                 {/* Index Section Header */}
                 <div className="flex items-center gap-4">
-                  <h2 className="text-2xl font-anton font-bold text-[#1A1A1A] tracking-tight">{cat.name.toUpperCase()}</h2>
+                  <h2 className="text-xl font-anton font-bold text-[#1A1A1A] tracking-tight">{cat.name.toUpperCase()}</h2>
                   <div className="h-px flex-1 bg-gray-200"></div>
                   <span className="text-xs font-bold text-gray-400 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm">
                     {catDishes.length} items
