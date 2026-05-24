@@ -5,15 +5,31 @@ import { Search, Star, Sparkles, CheckCircle2, MessageSquare, Map, Tag, ChefHat,
 import { ImageWithFallback, ReviewItemShimmer, ReviewStatsShimmer, TextShimmer, useLoading } from "@repo/ui";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useMyRestaurantReviews, useReplyToReview } from "@/features/store/hooks";
+import MobileReviews from "@/features/store/components/mobile/MobileReviews";
 
 export default function ReviewsPage() {
   const { hide } = useLoading();
+  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("relevant");
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Fetch reviews from API
   const {
@@ -22,7 +38,8 @@ export default function ReviewsPage() {
     totalReviews,
     averageRating,
     ratingDistribution,
-    unrepliedCount
+    unrepliedCount,
+    refetch
   } = useMyRestaurantReviews();
 
   const { replyToReview, isReplying } = useReplyToReview();
@@ -98,6 +115,34 @@ export default function ReviewsPage() {
       // Error handled by hook
     }
   };
+
+  if (!mounted) return null;
+
+  if (isMobile) {
+    return (
+      <MobileReviews
+        reviews={filteredReviews}
+        isLoading={isLoading}
+        totalReviews={totalReviews}
+        averageRating={averageRating}
+        ratingDistributionDisplay={ratingDistributionDisplay}
+        unrepliedCount={unrepliedCount}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        selectedRating={selectedRating}
+        setSelectedRating={setSelectedRating}
+        replyingTo={replyingTo}
+        setReplyingTo={setReplyingTo}
+        replyText={replyText}
+        setReplyText={setReplyText}
+        handleReply={handleReply}
+        isReplying={isReplying}
+        onRefresh={refetch}
+      />
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-[#F8F9FA] overflow-hidden">

@@ -100,7 +100,7 @@ export default function MobileHistoryCard({ order, onClick }: MobileHistoryCardP
 
           <div className="text-right">
             <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-400 leading-none block mb-1 opacity-50">Net Earnings</span>
-            <div className={`text-lg font-anton font-semibold ${isCompleted ? 'text-lime-600' : 'text-gray-500'} leading-none tracking-tight`}>
+            <div className={`text-lg font-anton font-semibold ${isCompleted ? 'text-primary' : 'text-gray-500'} leading-none tracking-tight`}>
               {isCompleted ? formatVnd(order.netIncome) : formatVnd(order.totalAmount)}
             </div>
           </div>
