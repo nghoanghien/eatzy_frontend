@@ -32,7 +32,8 @@ export default function OrderHistoryPage() {
     hasNextPage,
     fetchNextPage,
     refetch,
-    total
+    total,
+    error
   } = useOrderHistory(searchTerm, filterQuery);
 
   if (!mounted) return null;
@@ -50,6 +51,7 @@ export default function OrderHistoryPage() {
         onFilter={setFilterQuery}
         searchTerm={searchTerm}
         filterQuery={filterQuery}
+        isError={!!error}
       />
     );
   }

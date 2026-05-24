@@ -151,17 +151,17 @@ export const PremiumPriceRangeFilter = ({
   };
 
   return (
-    <div className="bg-white p-8 rounded-[36px] border border-gray-100 shadow-[0_0_30px_rgba(0,0,0,0.06)]">
+    <div className="bg-white p-4 md:p-8 rounded-[24px] md:rounded-[36px] border border-gray-100 shadow-[0_0_30px_rgba(0,0,0,0.06)]">
 
       {/* Price Display */}
       <div className="flex justify-between items-end mb-1 md:mb-6">
         <div>
           <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Selected range</h4>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-[#1A1A1A] tracking-tighter">{formatCurrency(localRange[0])}</span>
+          <div className="flex flex-wrap items-baseline gap-1 md:gap-2">
+            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1A1A1A] tracking-tighter">{formatCurrency(localRange[0])}</span>
             <span className="text-gray-200 font-bold">/</span>
-            <span className="text-3xl font-bold text-[#1A1A1A] tracking-tighter">{formatCurrency(localRange[1])}</span>
-            <span className="text-sm font-black text-gray-400 ml-1">{currencyLabel}</span>
+            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1A1A1A] tracking-tighter">{formatCurrency(localRange[1])}</span>
+            <span className="text-xs md:text-sm font-black text-gray-400 ml-1">{currencyLabel}</span>
           </div>
         </div>
         <div className="hidden md:block">
@@ -263,26 +263,26 @@ export const PremiumPriceRangeFilter = ({
         <div className="space-y-1 md:space-y-3">
           <label className="text-[10px] font-bold md:font-black text-gray-400 uppercase tracking-widest ml-1">Minimum</label>
           <div className="relative group">
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-lg">₫</div>
+            <div className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-sm md:text-lg">₫</div>
             <input
               type="text"
               value={formatCurrency(localRange[0])}
               onChange={(e) => handleInputChange('min', e.target.value)}
               onBlur={handleInputBlur}
-              className={`w-full bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-gray-100 focus:bg-white ${activeTheme.focusRing} rounded-2xl py-3 md:py-5 pl-12 pr-6 text-lg md:text-xl font-bold tracking-tight text-[#1A1A1A] transition-all outline-none`}
+              className={`w-full bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-gray-100 focus:bg-white ${activeTheme.focusRing} rounded-xl md:rounded-2xl py-2.5 md:py-5 pl-8 md:pl-12 pr-3 md:pr-6 text-sm sm:text-base md:text-xl font-bold tracking-tight text-[#1A1A1A] transition-all outline-none`}
             />
           </div>
         </div>
         <div className="space-y-1 md:space-y-3">
           <label className="text-[10px] font-bold md:font-black text-gray-400 uppercase tracking-widest ml-1">Maximum</label>
           <div className="relative group">
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-lg">₫</div>
+            <div className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-sm md:text-lg">₫</div>
             <input
               type="text"
               value={formatCurrency(localRange[1])}
               onChange={(e) => handleInputChange('max', e.target.value)}
               onBlur={handleInputBlur}
-              className={`w-full bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-gray-100 focus:bg-white ${activeTheme.focusRing} rounded-2xl py-3 md:py-5 pl-12 pr-6 text-lg md:text-xl font-bold tracking-tight text-[#1A1A1A] transition-all outline-none`}
+              className={`w-full bg-gray-50 border-2 border-transparent group-hover:bg-white group-hover:border-gray-100 focus:bg-white ${activeTheme.focusRing} rounded-xl md:rounded-2xl py-2.5 md:py-5 pl-8 md:pl-12 pr-3 md:pr-6 text-sm sm:text-base md:text-xl font-bold tracking-tight text-[#1A1A1A] transition-all outline-none`}
             />
           </div>
         </div>

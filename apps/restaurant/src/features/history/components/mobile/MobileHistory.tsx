@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from '@repo/ui/motion';
-import { Search, Filter, X, FileText, CheckCircle2 } from '@repo/ui/icons';
+import { Search, Filter, X, FileText, CheckCircle2, AlertCircle } from '@repo/ui/icons';
 import { PullToRefresh, HistoryCardShimmer } from '@repo/ui';
 import { useInfiniteScroll } from '@repo/hooks';
 import { OrderHistoryItem } from '@repo/types';
@@ -23,6 +23,7 @@ interface MobileHistoryProps {
   onFilter: (query: string) => void;
   searchTerm: string;
   filterQuery: string;
+  isError?: boolean;
 }
 
 export default function MobileHistory({
@@ -35,7 +36,8 @@ export default function MobileHistory({
   onSearch,
   onFilter,
   searchTerm,
-  filterQuery
+  filterQuery,
+  isError = false
 }: MobileHistoryProps) {
   const [searchInputValue, setSearchInputValue] = useState(searchTerm);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -161,13 +163,18 @@ export default function MobileHistory({
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsFilterOpen(true)}
-              className={`w-10 h-10 rounded-2xl border-2 flex items-center justify-center shadow-md transition-colors ${activeFiltersCount > 0
+              className={`relative w-10 h-10 rounded-2xl border-2 flex items-center justify-center shadow-md transition-colors ${activeFiltersCount > 0
                 ? 'bg-lime-500 border-lime-400 text-white shadow-lime-500/20'
                 : 'bg-gray-200/70 border-gray-200 text-gray-400'
                 }`}
               title="Filter Options"
             >
               <Filter size={20} strokeWidth={2.8} />
+              {activeFiltersCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-scale-in">
+                  {activeFiltersCount}
+                </span>
+              )}
             </motion.button>
           </div>
         </div>
@@ -207,7 +214,16 @@ export default function MobileHistory({
         refreshingText="Đang tải..."
       >
         <div className="p-3.5 space-y-3 pb-32 relative">
-          {isLoading && filteredData.length === 0 ? (
+          {isError ? (
+            <EmptyState
+              icon={AlertCircle}
+              title="Failed to Load History"
+              description="Could not retrieve order history logs. Please check your connection and try again."
+              className="py-16"
+              buttonText="Retry"
+              onButtonClick={onRefresh}
+            />
+          ) : isLoading && filteredData.length === 0 ? (
             <HistoryCardShimmer cardCount={3} />
           ) : (
             <>
@@ -227,7 +243,9 @@ export default function MobileHistory({
                   icon={FileText}
                   title="No Orders Found"
                   description="Không tìm thấy đơn hàng nào khớp với tiêu chí tìm kiếm của bạn. Hãy thử thay đổi bộ lọc."
-                  className="py-20"
+                  className="py-16"
+                  buttonText="Clear Filters"
+                  onButtonClick={handleClearFilters}
                 />
               )}
 
