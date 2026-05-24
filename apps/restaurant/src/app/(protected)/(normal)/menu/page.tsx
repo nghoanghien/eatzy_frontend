@@ -8,7 +8,12 @@ import MobileMenu from '@/features/menu/components/MobileMenu';
 
 export default function MenuPage() {
   const { hide } = useLoading();
+  const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ======== API Data Hook ========
   const {
@@ -55,6 +60,8 @@ export default function MenuPage() {
       hide();
     }
   }, [hide, isLoading]);
+
+  if (!mounted) return null;
 
   if (isLoading) {
     if (isMobile) {

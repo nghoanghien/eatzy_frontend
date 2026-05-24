@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import {
   Search, Star, Sparkles, CheckCircle2, MessageSquare, Map, Tag, ChefHat,
-  ChevronDown, Send, X, AlertCircle, ArrowLeft
+  ChevronDown, Send, X, AlertCircle, ArrowLeft, ChevronRight
 } from '@repo/ui/icons';
 import { ImageWithFallback, ReviewItemShimmer, PullToRefresh } from '@repo/ui';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { useMobileBackHandler } from '@/hooks/useMobileBackHandler';
+import { useOrderDetail } from '@/features/history/hooks/useOrderDetail';
+import MobileHistoryDrawer from '@/features/history/components/mobile/MobileHistoryDrawer';
 
 interface ReviewDisplayItem {
   id: number;
@@ -67,6 +70,23 @@ export default function MobileReviews({
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
+  // Hook and state to manage order details drawer loading
+  const { order: selectedOrderDetails, fetchOrder, clearOrder } = useOrderDetail();
+  const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false);
+  const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null);
+
+  const handleOpenOrder = (orderId: string) => {
+    setLoadingOrderId(orderId);
+    fetchOrder(orderId);
+  };
+
+  useEffect(() => {
+    if (selectedOrderDetails && loadingOrderId) {
+      setIsOrderDrawerOpen(true);
+      setLoadingOrderId(null);
+    }
+  }, [selectedOrderDetails, loadingOrderId]);
+
   // Close sort dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -81,6 +101,14 @@ export default function MobileReviews({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isSortOpen]);
+
+  // Intercept system back button to close the reply drawer if open
+  useMobileBackHandler(replyingTo !== null, () => {
+    setReplyingTo(null);
+    setReplyText('');
+  });
+
+  const selectedReview = replyingTo !== null ? reviews.find(r => r.id === replyingTo) || null : null;
 
   const sortOptions = [
     { value: 'relevant', label: 'Most Relevant' },
@@ -109,7 +137,7 @@ export default function MobileReviews({
                   REVIEWS & FEEDBACKS
                 </h1>
                 {unrepliedCount > 0 ? (
-                  <span className="inline-block mt-0.5 px-2 py-0.5 rounded-lg bg-orange-100 text-orange-700 text-[10px] font-semibold uppercase tracking-tight">
+                  <span className="inline-block mt-0.5 px-2 py-0.5 rounded-lg bg-gray-200 text-gray-700 text-[10px] font-semibold uppercase tracking-tight">
                     {unrepliedCount} unreplied
                   </span>
                 ) : (
@@ -133,13 +161,13 @@ export default function MobileReviews({
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
               <button
                 onClick={() => setSelectedRating(null)}
-                className={`flex-shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl text-[10px] font-anton tracking-wider transition-all border-2 ${selectedRating === null
-                  ? 'bg-[var(--primary)] border-[var(--primary)] text-[#1A1A1A] shadow-md shadow-[var(--primary)]/10'
-                  : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200'
+                className={`flex-shrink-0 flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-[11px] tracking-tight transition-all border-2 ${selectedRating === null
+                  ? 'bg-[var(--primary)] border-[var(--primary)] text-[#1A1A1A] font-bold shadow-md shadow-[var(--primary)]/10'
+                  : 'bg-white border-gray-100 text-gray-500 font-medium hover:border-gray-200'
                   }`}
               >
-                <span className="uppercase font-semibold">All</span>
-                <span className="opacity-40 text-[9px] leading-tight mt-0.5">{totalReviews} Reviews</span>
+                <span className="uppercase font-bold tracking-tight">All</span>
+                <span className="opacity-60 text-[9px] font-semibold mt-0.5 tracking-tight">{totalReviews} Reviews</span>
               </button>
               {[5, 4, 3, 2, 1].map((stars) => {
                 const count = ratingDistributionDisplay.find(d => d.stars === stars)?.count || 0;
@@ -147,16 +175,16 @@ export default function MobileReviews({
                   <button
                     key={stars}
                     onClick={() => setSelectedRating(selectedRating === stars ? null : stars)}
-                    className={`flex-shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl text-[10px] font-anton tracking-wider transition-all border-2 ${selectedRating === stars
-                      ? 'bg-[var(--primary)] border-[var(--primary)] text-[#1A1A1A] shadow-md shadow-[var(--primary)]/10'
-                      : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200'
+                    className={`flex-shrink-0 flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-[11px] tracking-tight transition-all border-2 ${selectedRating === stars
+                      ? 'bg-[var(--primary)] border-[var(--primary)] text-[#1A1A1A] font-bold shadow-md shadow-[var(--primary)]/10'
+                      : 'bg-white border-gray-100 text-gray-500 font-medium hover:border-gray-200'
                       }`}
                   >
                     <div className="flex items-center gap-1">
-                      <span>{stars}</span>
+                      <span className="font-bold">{stars}</span>
                       <Star className={`w-2.5 h-2.5 ${selectedRating === stars ? 'fill-[#1A1A1A] text-[#1A1A1A]' : 'text-gray-400'}`} />
                     </div>
-                    <span className="opacity-40 text-[9px] leading-tight mt-0.5">{count} Reviews</span>
+                    <span className="opacity-60 text-[9px] font-semibold mt-0.5 tracking-tight">{count} Reviews</span>
                   </button>
                 );
               })}
@@ -184,25 +212,21 @@ export default function MobileReviews({
                   <AnimatePresence>
                     {isSortOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2, type: 'spring', damping: 20, stiffness: 300 }}
-                        className="absolute right-0 top-full mt-3 w-56 bg-white rounded-[24px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-white p-2 z-30 overflow-hidden"
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className="absolute right-0 top-[calc(100%+8px)] w-40 bg-white/90 backdrop-blur-xl rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-gray-100 z-50 overflow-hidden py-2"
                       >
                         {sortOptions.map(option => (
                           <button
                             key={option.value}
                             onClick={() => { setSortBy(option.value); setIsSortOpen(false); }}
-                            className={`w-full text-left px-4 py-3 text-xs rounded-xl transition-all flex items-center justify-between mb-1 last:mb-0 ${sortBy === option.value
-                              ? 'text-[var(--primary)] font-bold bg-[var(--primary)]/10'
-                              : 'text-gray-700 hover:bg-slate-50 font-medium'
+                            className={`w-full text-left px-5 py-3.5 text-sm font-bold transition-all ${sortBy === option.value
+                              ? 'bg-gray-50 text-black'
+                              : 'text-gray-600 hover:bg-gray-50'
                               }`}
                           >
-                            <span className={sortBy === option.value ? 'font-bold px-1' : 'font-medium'}>
-                              {option.label}
-                            </span>
-                            {sortBy === option.value && <div className="w-2 h-2 rounded-full bg-[var(--primary)] shadow-[0_0_10px_rgba(255,190,0,0.5)]" />}
+                            {option.label}
                           </button>
                         ))}
                       </motion.div>
@@ -272,12 +296,29 @@ export default function MobileReviews({
                               src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.authorName}`}
                               alt={review.authorName}
                               fill
+                              placeholderMode="horizontal"
                               className="object-cover"
                             />
                           </div>
                           <div className="flex-grow flex-1 min-w-0">
-                            <div className="font-bold text-gray-900 text-sm">{review.authorName}</div>
-                            <div className="text-xs text-gray-500 font-medium">Order #{review.orderId}</div>
+                            <div className="font-bold text-[#1A1A1A] text-sm leading-tight tracking-tight">{review.authorName}</div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              {loadingOrderId === review.orderId ? (
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs text-gray-500 font-medium border-b border-dashed border-gray-500/40 pb-0.5">
+                                    Order #{review.orderId}
+                                  </span>
+                                  <div className="w-3 h-3 border-2 border-lime-600/30 border-t-lime-600 rounded-full animate-spin shrink-0" />
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleOpenOrder(review.orderId)}
+                                  className="text-xs text-gray-500 font-medium border-b border-dashed border-gray-500/40 pb-0.5 active:opacity-70 transition-opacity"
+                                >
+                                  Order #{review.orderId}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -287,67 +328,50 @@ export default function MobileReviews({
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-3 h-3 ${i < Math.floor(review.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`}
+                                className={`w-3 h-3 ${i < Math.floor(review.rating) ? 'fill-[var(--primary)] text-[var(--primary)]' : 'text-gray-200'}`}
                               />
                             ))}
                           </div>
                           <span className="text-gray-300">·</span>
-                          <span className="text-gray-500 font-medium">{review.date}</span>
+                          <span className="text-gray-400 font-medium tracking-tight text-xs">{review.date}</span>
                         </div>
 
                         {/* Review Content */}
-                        <p className="text-gray-700 leading-relaxed text-[15px] font-medium tracking-tight">
+                        <p className="font-medium text-[#1A1A1A] leading-relaxed text-[15px] tracking-tight">
                           {review.content}
                         </p>
 
-                        {/* Admin Reply or Reply Form */}
+                        {/* Admin Reply - Airbnb style nested flat layout */}
                         {review.reply ? (
-                          <div className="mt-4 p-4 bg-gray-50 rounded-2xl border-l-4 border-[var(--primary)] space-y-0">
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-900">
-                              <div className="w-5 h-5 rounded-full bg-[var(--primary)] flex items-center justify-center text-white">
-                                <ChefHat size={12} />
+                          <div className="mt-4 pl-2 space-y-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-200/60 flex items-center justify-center text-gray-500 shrink-0">
+                                <ChefHat className="w-4 h-4 text-gray-500" />
                               </div>
-                              Response from host
+                              <div className="min-w-0">
+                                <div className="text-xs font-bold text-[#1A1A1A] leading-tight tracking-tight">Response from host</div>
+                                <div className="text-[10px] text-gray-400 font-medium tracking-tight mt-0.5">{review.date}</div>
+                              </div>
                             </div>
-                            <p className="text-gray-600 text-sm leading-relaxed italic pl-1 mt-1">
-                              "{review.reply}"
+                            <p className="font-medium text-[#1A1A1A] leading-relaxed text-[14px] pl-[42px] tracking-tight">
+                              {review.reply}
                             </p>
                           </div>
-                        ) : replyingTo === review.id ? (
-                          <div className="mt-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                placeholder="Type your reply..."
-                                className="flex-1 px-4 py-3 text-xs bg-slate-50 border-2 border-white rounded-xl focus:border-[var(--primary)]/20 focus:ring-4 focus:ring-[var(--primary)]/5 focus:outline-none transition-all"
-                                disabled={isReplying}
-                              />
-                              <button
-                                onClick={() => handleReply(review.id)}
-                                disabled={isReplying || !replyText.trim()}
-                                className="px-4 py-3 bg-lime-500 text-white rounded-xl font-bold text-xs hover:bg-lime-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0 transition-colors"
-                              >
-                                <Send className="w-3.5 h-3.5" />
-                                <span>{isReplying ? '...' : 'Send'}</span>
-                              </button>
-                              <button
-                                onClick={() => { setReplyingTo(null); setReplyText(''); }}
-                                className="p-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-colors"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
                         ) : (
-                          <button
-                            onClick={() => setReplyingTo(review.id)}
-                            className="mt-3 flex items-center gap-2 text-xs font-bold text-lime-600 hover:text-lime-700 transition-colors py-1 px-2 hover:bg-lime-55/10 rounded-lg w-fit"
-                          >
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            Reply to review
-                          </button>
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => {
+                                setReplyingTo(review.id);
+                                setReplyText('');
+                              }}
+                              className="flex flex-col items-start gap-0.5 active:scale-95 transition-all text-left"
+                            >
+                              <div className="flex items-center gap-1 text-lime-600">
+                                <span className="text-[12px] font-bold border-b-2 border-dotted border-lime-500/40 pb-0.5 tracking-tight">Write your response now</span>
+                                <ChevronRight className="w-3.5 h-3.5 text-lime-600" strokeWidth={3} />
+                              </div>
+                            </button>
+                          </div>
                         )}
                       </motion.div>
                     );
@@ -372,6 +396,141 @@ export default function MobileReviews({
           </div>
         </div>
       </PullToRefresh>
+
+      {/* MOBILE REPLY BOTTOM DRAWER */}
+      <AnimatePresence>
+        {replyingTo !== null && selectedReview && (
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => { setReplyingTo(null); setReplyText(''); }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[80] md:hidden"
+            />
+
+            {/* Bottom Sheet Drawer */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 18, stiffness: 100 }}
+              className="fixed bottom-0 left-0 right-0 z-[90] bg-[#F8F9FA] rounded-t-[40px] overflow-hidden max-h-[94vh] flex flex-col shadow-2xl border-t border-white/20 md:hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 pb-3 border-b border-gray-100 bg-white">
+                <div>
+                  <h2 className="text-2xl font-bold font-anton text-[#1A1A1A] uppercase">
+                    REPLY TO REVIEW
+                  </h2>
+                  <div className="text-gray-500 text-xs font-semibold mt-0.5 flex items-center gap-2 tracking-tight">
+                    <span>Order ID: #{selectedReview.orderId} • {selectedReview.authorName}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setReplyingTo(null); setReplyText(''); }}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-700" />
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto no-scrollbar p-5 space-y-5 pb-28">
+                {/* The Review Card */}
+                <div className="bg-white rounded-[32px] p-5 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border border-gray-100/50">
+                  <div className="flex items-start gap-3">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                      <ImageWithFallback
+                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedReview.authorName}`}
+                        alt={selectedReview.authorName}
+                        fill
+                        placeholderMode="horizontal"
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-grow flex-1 min-w-0">
+                      <div className="font-bold text-[#1A1A1A] text-sm leading-tight tracking-tight">{selectedReview.authorName}</div>
+                      <div className="text-xs text-gray-500 font-semibold mt-0.5 tracking-tight">Order #{selectedReview.orderId}</div>
+                    </div>
+                  </div>
+
+                  {/* Rating & Date */}
+                  <div className="flex items-center gap-2 text-xs mt-3">
+                    <div className="flex gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3 h-3 ${i < Math.floor(selectedReview.rating) ? 'fill-[var(--primary)] text-[var(--primary)]' : 'text-gray-200'}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-gray-300">·</span>
+                    <span className="text-gray-400 font-medium tracking-tight text-xs">{selectedReview.date}</span>
+                  </div>
+
+                  {/* Review Content */}
+                  <p className="font-medium text-[#1A1A1A] leading-relaxed text-[14px] mt-3 italic tracking-tight">
+                    "{selectedReview.content}"
+                  </p>
+                </div>
+
+                {/* Input Form */}
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                    Your Response
+                  </label>
+                  <textarea
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="Type your response to this customer..."
+                    rows={5}
+                    className="w-full bg-white rounded-3xl border border-gray-200 p-4 text-sm font-medium text-[#1A1A1A] tracking-tight focus:outline-none focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/5 resize-none shadow-sm transition-all"
+                    disabled={isReplying}
+                  />
+                </div>
+              </div>
+
+              {/* Sticky Actions Footer */}
+              <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3 rounded-t-[32px] shrink-0 z-20">
+                <motion.button
+                  whileTap={isReplying || !replyText.trim() ? {} : { scale: 0.98 }}
+                  onClick={async () => {
+                    await handleReply(selectedReview.id);
+                  }}
+                  disabled={isReplying || !replyText.trim()}
+                  className={`w-full py-3.5 rounded-3xl font-bold text-base tracking-tight shadow-lg transition-all flex items-center justify-center gap-3 ${isReplying || !replyText.trim()
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-lime-500 text-white shadow-lime-500/30 hover:bg-lime-600"
+                    }`}
+                >
+                  {isReplying ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Send Response</span>
+                      <Send className="w-4 h-4" />
+                    </>
+                  )}
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* MOBILE HISTORY DRAWER FOR INLINE ORDER LOGS */}
+      <MobileHistoryDrawer
+        open={isOrderDrawerOpen}
+        order={selectedOrderDetails}
+        onClose={() => {
+          setIsOrderDrawerOpen(false);
+          setTimeout(() => {
+            clearOrder();
+          }, 300);
+        }}
+      />
     </div>
   );
 }

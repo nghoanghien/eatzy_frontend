@@ -157,13 +157,13 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
                   value={cat.name}
                   disabled={status === 'deleted'}
                   onChange={(e) => handleUpdateName(cat.id, e.target.value)}
-                  className={`flex-1 min-w-0 bg-transparent text-sm font-bold text-[#1A1A1A] placeholder-gray-400 focus:outline-none py-1 border-b border-transparent focus:border-[var(--primary)] ${status === 'deleted' ? 'line-through text-gray-400' : ''}`}
+                  className={`flex-1 min-w-0 bg-transparent text-sm font-bold text-[#1A1A1A] tracking-tight placeholder-gray-400 focus:outline-none py-1 border-b border-transparent focus:border-[var(--primary)] ${status === 'deleted' ? 'line-through text-gray-400' : ''}`}
                 />
 
                 {status === 'deleted' ? (
                   <button
                     onClick={() => handleRestoreCategory(cat.id)}
-                    className="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                    className="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all tracking-tight"
                     title="Khôi phục"
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -183,7 +183,7 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
 
         <button
           onClick={handleAddCategory}
-          className="mt-6 w-full border-2 border-dashed border-gray-200 rounded-3xl py-3 flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-[var(--primary)] hover:border-[var(--primary)]/30 hover:bg-[var(--primary)]/5 transition-all"
+          className="mt-6 w-full border-2 border-dashed border-gray-200 rounded-3xl py-3 flex items-center justify-center gap-2 text-sm font-bold text-gray-500 tracking-tight hover:text-[var(--primary)] hover:border-[var(--primary)]/30 hover:bg-[var(--primary)]/5 transition-all"
         >
           <Plus className="w-4 h-4" />
           <span>Thêm danh mục</span>
@@ -196,7 +196,7 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
           whileTap={isSaving ? {} : { scale: 0.98 }}
           onClick={handleSave}
           disabled={isSaving}
-          className={`w-full py-3.5 rounded-3xl font-bold text-base shadow-lg transition-all flex items-center justify-center gap-3 ${isSaving
+          className={`w-full py-3.5 rounded-3xl font-bold text-base tracking-tight shadow-lg transition-all flex items-center justify-center gap-3 ${isSaving
             ? "bg-gray-400 text-white cursor-not-allowed"
             : "bg-lime-500 text-white shadow-lime-500/30 hover:bg-lime-600"
             }`}

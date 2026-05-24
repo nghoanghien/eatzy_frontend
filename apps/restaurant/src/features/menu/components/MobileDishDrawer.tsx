@@ -230,7 +230,7 @@ export default function MobileDishDrawer({
                 <h2 className="text-2xl font-bold font-anton text-[#1A1A1A] uppercase">
                   {mode === 'create' ? 'THÊM MÓN ĂN MỚI' : 'CHỈNH SỬA MÓN ĂN'}
                 </h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mt-0.5">
                   {draftDish.name || 'Tên món ăn'}
                 </p>
               </div>
@@ -275,22 +275,22 @@ export default function MobileDishDrawer({
                   >
                     {/* Name Input */}
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Tên món</label>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-2">Tên món</label>
                       <input
                         type="text"
                         value={draftDish.name}
                         onChange={(e) => updateDraft({ name: e.target.value })}
-                        className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-base font-bold text-[#1A1A1A] focus:outline-none focus:border-[var(--primary)] shadow-sm"
+                        className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-base font-bold text-[#1A1A1A] tracking-tight focus:outline-none focus:border-[var(--primary)] shadow-sm"
                         placeholder="Nhập tên món ăn..."
                       />
                     </div>
 
                     {/* Category Selector */}
                     <div className="relative">
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Danh mục món</label>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-2">Danh mục món</label>
                       <button
                         onClick={() => setIsCatOpen(!isCatOpen)}
-                        className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold text-[#1A1A1A] flex items-center justify-between hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 shadow-sm"
+                        className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm font-bold text-[#1A1A1A] tracking-tight flex items-center justify-between hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 shadow-sm"
                       >
                         <span>{categories.find(c => c.id === draftDish.menuCategoryId)?.name || 'Chọn danh mục...'}</span>
                         <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isCatOpen ? 'rotate-180' : ''}`} />
@@ -298,19 +298,21 @@ export default function MobileDishDrawer({
                       <AnimatePresence>
                         {isCatOpen && (
                           <motion.div
-                            initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                            className="absolute z-30 left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden py-1 max-h-48 overflow-y-auto"
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className="absolute left-0 right-0 top-[calc(100%+8px)] bg-white/90 backdrop-blur-xl rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-gray-100 z-50 overflow-hidden py-2 max-h-52 overflow-y-auto no-scrollbar"
                           >
                             {categories.map(c => (
                               <button
                                 key={c.id}
                                 onClick={() => { updateDraft({ menuCategoryId: c.id }); setIsCatOpen(false); }}
-                                className={`w-full text-left px-4 py-3 text-xs font-bold hover:bg-gray-50 flex items-center justify-between ${draftDish.menuCategoryId === c.id ? 'bg-[var(--primary)]/5 text-[var(--primary)]' : 'text-gray-600'}`}
+                                className={`w-full text-left px-8 py-3.5 text-sm font-bold tracking-tight transition-all ${draftDish.menuCategoryId === c.id
+                                  ? 'bg-gray-50 text-black'
+                                  : 'text-gray-600 hover:bg-gray-50'
+                                  }`}
                               >
-                                <span>{c.name}</span>
-                                {draftDish.menuCategoryId === c.id && <div className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]"></div>}
+                                {c.name}
                               </button>
                             ))}
                           </motion.div>
@@ -320,7 +322,7 @@ export default function MobileDishDrawer({
 
                     {/* Price Input */}
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Giá gốc (VNĐ)</label>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-2">Giá gốc (VNĐ)</label>
                       <input
                         type="text"
                         value={draftDish.price === 0 ? '' : draftDish.price.toLocaleString('vi-VN')}
@@ -330,7 +332,7 @@ export default function MobileDishDrawer({
                             updateDraft({ price: Number(rawValue) });
                           }
                         }}
-                        className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-base font-bold text-[#1A1A1A] focus:outline-none focus:border-[var(--primary)] shadow-sm"
+                        className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-base font-bold text-[#1A1A1A] tracking-tight focus:outline-none focus:border-[var(--primary)] shadow-sm"
                         placeholder="0"
                       />
                     </div>
@@ -338,10 +340,10 @@ export default function MobileDishDrawer({
                     {/* Stock Management */}
                     <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
                       <div className="flex items-center justify-between mb-3">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
                           Tồn kho hiện tại
                         </label>
-                        <span className="text-lg font-bold text-[#1A1A1A]">{draftDish.availableQuantity}</span>
+                        <span className="text-lg font-bold text-[#1A1A1A] tracking-tight">{draftDish.availableQuantity}</span>
                       </div>
 
                       <div className="flex items-center justify-between gap-4">
@@ -359,18 +361,18 @@ export default function MobileDishDrawer({
 
                     {/* Image Edit */}
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Hình ảnh món</label>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-2">Hình ảnh món</label>
                       <div className="relative aspect-[16/10] bg-gray-100 rounded-3xl overflow-hidden group border border-gray-200 shadow-sm flex items-center justify-center">
                         {draftDish.imageUrl ? (
                           <ImageWithFallback src={draftDish.imageUrl} alt={draftDish.name} fill className="object-cover" />
                         ) : (
                           <div className="flex flex-col items-center justify-center text-gray-400 gap-1">
                             <Camera className="w-8 h-8 opacity-40" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Chưa có ảnh</span>
+                            <span className="text-[10px] font-bold uppercase tracking-tight opacity-60">Chưa có ảnh</span>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 active:opacity-100 transition-opacity">
-                          <button className="bg-white text-[#1A1A1A] px-4 py-2 rounded-xl text-xs font-bold shadow-md">
+                          <button className="bg-white text-[#1A1A1A] px-4 py-2 rounded-xl text-xs font-bold shadow-md tracking-tight">
                             {draftDish.imageUrl ? 'Đổi ảnh' : 'Thêm ảnh'}
                           </button>
                         </div>
@@ -379,12 +381,12 @@ export default function MobileDishDrawer({
 
                     {/* Description Edit */}
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Mô tả</label>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-2">Mô tả</label>
                       <textarea
                         value={draftDish.description || ''}
                         onChange={(e) => updateDraft({ description: e.target.value })}
                         rows={3}
-                        className="w-full bg-white rounded-3xl border border-gray-200 p-4 text-sm font-medium text-[#555] focus:outline-none focus:border-[var(--primary)] resize-none shadow-sm transition-all"
+                        className="w-full bg-white rounded-3xl border border-gray-200 p-4 text-sm font-medium text-[#555] tracking-tight focus:outline-none focus:border-[var(--primary)] resize-none shadow-sm transition-all"
                         placeholder="Mô tả chi tiết món ăn..."
                       />
                     </div>
@@ -399,7 +401,7 @@ export default function MobileDishDrawer({
                     className="space-y-4"
                   >
                     <div className="flex items-center justify-between mb-2 px-2">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Danh sách nhóm tùy chọn</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">Danh sách nhóm tùy chọn</span>
                       <button
                         onClick={handleAddGroup}
                         className="bg-[var(--primary)] text-white px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide shadow flex items-center gap-1 hover:scale-105 active:scale-95 transition-all"
@@ -411,8 +413,8 @@ export default function MobileDishDrawer({
 
                     {optionGroups.length === 0 ? (
                       <div className="py-12 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl bg-white">
-                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Chưa có tùy chọn nào</p>
-                        <p className="text-[10px] text-gray-400 mt-1 font-semibold">Bấm nút phía trên để tạo thêm nhóm lựa chọn</p>
+                        <p className="text-xs font-bold uppercase tracking-tight text-gray-400">Chưa có tùy chọn nào</p>
+                        <p className="text-[10px] text-gray-400 mt-1 font-semibold tracking-tight">Bấm nút phía trên để tạo thêm nhóm lựa chọn</p>
                       </div>
                     ) : (
                       <Reorder.Group axis="y" values={optionGroups} onReorder={updateGroups} className="space-y-3">
@@ -441,7 +443,7 @@ export default function MobileDishDrawer({
                                         type="text"
                                         value={group.title}
                                         onChange={(e) => handleUpdateGroup(group.id, { title: e.target.value })}
-                                        className={`flex-1 bg-transparent text-sm font-bold placeholder-gray-400 focus:outline-none border-b border-transparent py-0.5 ${isVariant ? 'text-[var(--primary)] focus:border-[var(--primary)]' : 'text-[#1A1A1A] focus:border-[var(--primary)]'}`}
+                                        className={`flex-1 bg-transparent text-sm font-bold tracking-tight placeholder-gray-400 focus:outline-none border-b border-transparent py-0.5 ${isVariant ? 'text-[var(--primary)] focus:border-[var(--primary)]' : 'text-[#1A1A1A] focus:border-[var(--primary)]'}`}
                                         placeholder="Nhóm tùy chọn (VD: Size, Topping)"
                                       />
                                       <button onClick={() => handleRemoveGroup(group.id)} className="text-gray-400 hover:text-red-500 p-1">
@@ -519,7 +521,7 @@ export default function MobileDishDrawer({
                                               type="text"
                                               value={option.name}
                                               onChange={(e) => handleUpdateChoice(group.id, option.id, { name: e.target.value })}
-                                              className="flex-1 min-w-0 bg-transparent text-xs font-bold text-[#1A1A1A] placeholder-gray-400 focus:outline-none"
+                                              className="flex-1 min-w-0 bg-transparent text-xs font-bold text-[#1A1A1A] tracking-tight placeholder-gray-400 focus:outline-none"
                                               placeholder="Tên lựa chọn"
                                             />
                                             <div className="flex items-center gap-1 w-24 shrink-0">
@@ -570,7 +572,7 @@ export default function MobileDishDrawer({
                 whileTap={isSaving || !hasChanges() ? {} : { scale: 0.98 }}
                 onClick={handleSaveDetails}
                 disabled={isSaving || !hasChanges()}
-                className={`w-full py-3.5 rounded-3xl font-bold text-base shadow-lg transition-all flex items-center justify-center gap-3 ${isSaving || !hasChanges()
+                className={`w-full py-3.5 rounded-3xl font-bold text-base tracking-tight shadow-lg transition-all flex items-center justify-center gap-3 ${isSaving || !hasChanges()
                   ? "bg-gray-400 text-white cursor-not-allowed"
                   : "bg-lime-500 text-white shadow-lime-500/30 hover:bg-lime-600"
                   }`}

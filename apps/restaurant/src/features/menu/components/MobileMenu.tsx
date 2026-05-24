@@ -187,9 +187,9 @@ export default function MobileMenu({
   }, [dishes, searchQuery]);
 
   return (
-    <div className="h-screen flex flex-col md:hidden overflow-hidden">
+    <div className="h-screen flex flex-col md:hidden overflow-hidden bg-[#F7F7F7]">
       {/* Sticky Header & Categories Wrapper */}
-      <div className="sticky top-0 z-30 shrink-0">
+      <div className="absolute top-0 left-0 right-0 z-30 bg-[#F7F7F7]/85 backdrop-blur-md pb-6 max-md:[mask-image:linear-gradient(to_bottom,black_88%,transparent)]">
         {/* Header - Styled like Mobile Orders header */}
         <div className="px-3 pt-4 pb-4">
           <div className="flex items-center justify-between mb-4 px-2">
@@ -270,7 +270,7 @@ export default function MobileMenu({
       {/* Main index scroll list - Renders all sections sequentially */}
       <div
         ref={mainScrollRef}
-        className="flex-1 p-4 py-2 space-y-10 overflow-y-auto no-scrollbar scroll-smooth"
+        className="flex-1 p-4 pt-[208px] pb-24 space-y-10 overflow-y-auto no-scrollbar scroll-smooth"
       >
         {categories.length === 0 ? (
           <div className="py-20 flex flex-col items-center justify-center text-gray-400 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">

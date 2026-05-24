@@ -152,7 +152,7 @@ export default function MobileHistory({
   return (
     <div className="h-screen flex flex-col bg-[#F7F7F7] overflow-hidden md:hidden">
       {/* Sticky Header & Search area */}
-      <div className="px-4 pt-4 pb-4 shrink-0">
+      <div className="absolute top-0 left-0 right-0 z-30 bg-[#F7F7F7]/85 backdrop-blur-md px-4 pt-4 pb-10 max-md:[mask-image:linear-gradient(to_bottom,black_84%,transparent)]">
         <div className="flex items-center justify-between mb-4 px-1">
           <div>
             <h1 className="text-2xl font-anton font-bold text-gray-900 uppercase tracking-tight leading-none">
@@ -213,7 +213,7 @@ export default function MobileHistory({
         releaseText="Thả tay để cập nhật"
         refreshingText="Đang tải..."
       >
-        <div className="p-3.5 space-y-3 pb-32 relative">
+        <div className="p-3.5 pt-[152px] space-y-3 pb-32 relative">
           {isError ? (
             <EmptyState
               icon={AlertCircle}
