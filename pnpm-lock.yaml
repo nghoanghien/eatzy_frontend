@@ -260,6 +260,9 @@ importers:
       '@repo/fonts':
         specifier: workspace:*
         version: link:../../packages/fonts
+      '@repo/hooks':
+        specifier: workspace:*
+        version: link:../../packages/hooks
       '@repo/lib':
         specifier: workspace:*
         version: link:../../packages/lib

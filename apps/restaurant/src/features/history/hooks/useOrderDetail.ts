@@ -41,7 +41,8 @@ export function mapOrderResponseToOrderHistoryItem(res: OrderResponse): OrderHis
         } : undefined,
         reviewRating: 0, // Rating not in OrderResponse, defaulting to 0
         pickupAddress: res.restaurant.address,
-        deliveryAddress: res.deliveryAddress
+        deliveryAddress: res.deliveryAddress,
+        cancellationReason: res.cancellationReason
     };
 }
 

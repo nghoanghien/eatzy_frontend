@@ -179,4 +179,5 @@ export interface OrderHistoryItem {
   reviewRating?: number;
   pickupAddress?: string;
   deliveryAddress?: string;
+  cancellationReason?: string;
 }

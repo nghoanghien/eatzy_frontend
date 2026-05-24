@@ -28,6 +28,7 @@ export interface OrderHistoryItem {
   reviewRating?: number;
   pickupAddress?: string;
   deliveryAddress?: string;
+  cancellationReason?: string;
 }
 
 const DRIVER_NAMES = ['Nguyễn Văn A', 'Trần Văn B', 'Lê Thị C', 'Phạm Văn D'];
@@ -81,5 +82,6 @@ export const mockOrderHistory: OrderHistoryItem[] = Array.from({ length: 50 }).m
     restaurantName: 'Eatzy Restaurant',
     pickupAddress: '123 Food Street, District 1, HCMC',
     deliveryAddress: `${Math.floor(Math.random() * 100)} Nguyen Hue Street, District ${Math.floor(Math.random() * 10) + 1}, HCMC`,
+    cancellationReason: status === 'cancelled' ? 'Hết món ăn hoặc quá thời gian chuẩn bị' : undefined,
   };
 });

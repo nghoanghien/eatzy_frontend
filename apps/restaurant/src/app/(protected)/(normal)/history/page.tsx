@@ -4,14 +4,25 @@ import { useState, useEffect } from 'react';
 import { History } from '@repo/ui/icons';
 import { useOrderHistory } from '@/features/history/hooks/useOrderHistory';
 import OrderHistoryTable from '@/features/history/components/OrderHistoryTable';
+import MobileHistory from '@/features/history/components/mobile/MobileHistory';
 
 export default function OrderHistoryPage() {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const {
@@ -25,6 +36,23 @@ export default function OrderHistoryPage() {
   } = useOrderHistory(searchTerm, filterQuery);
 
   if (!mounted) return null;
+
+  if (isMobile) {
+    return (
+      <MobileHistory
+        data={orders}
+        isLoading={isLoading}
+        isFetchingNextPage={isFetchingNextPage}
+        hasNextPage={hasNextPage}
+        onLoadMore={fetchNextPage}
+        onRefresh={refetch}
+        onSearch={setSearchTerm}
+        onFilter={setFilterQuery}
+        searchTerm={searchTerm}
+        filterQuery={filterQuery}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] pb-32">
