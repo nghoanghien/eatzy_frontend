@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Reorder } from '@repo/ui/motion';
+import { Reorder, motion } from '@repo/ui/motion';
 import { MenuCategory } from '@repo/types';
 import { Plus, Trash2, GripVertical, Save, X, RotateCcw } from '@repo/ui/icons';
 import { useSwipeConfirmation } from '@repo/ui';
@@ -113,7 +113,7 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
   };
 
   return (
-    <div className="bg-white w-[500px] max-w-[90vw] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div className="bg-white w-[500px] max-w-[90vw] rounded-[36px] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
         <h2 className="text-xl font-anton font-bold text-[#1A1A1A]">CATEGORIES MANAGER</h2>
@@ -123,7 +123,7 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <Reorder.Group axis="y" values={localCategories} onReorder={setLocalCategories} className="space-y-3">
           {localCategories.map((cat) => {
             const status = getStatus(cat);
@@ -145,10 +145,10 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
               <Reorder.Item
                 key={cat.id}
                 value={cat}
-                className={`${bgClass} rounded-xl border p-3 flex items-center gap-4 cursor-grab active:cursor-grabbing hover:shadow-sm relative overflow-hidden`}
+                className={`${bgClass} rounded-3xl border p-3 flex items-center gap-3 cursor-grab active:cursor-grabbing hover:shadow-sm relative overflow-hidden`}
               >
                 {label}
-                <div className="text-gray-400 p-1">
+                <div className="text-gray-400 p-1 flex-shrink-0">
                   <GripVertical className="w-5 h-5" />
                 </div>
 
@@ -157,13 +157,13 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
                   value={cat.name}
                   disabled={status === 'deleted'}
                   onChange={(e) => handleUpdateName(cat.id, e.target.value)}
-                  className={`flex-1 bg-transparent text-sm font-bold text-[#1A1A1A] placeholder-gray-400 focus:outline-none py-1 border-b border-transparent focus:border-[var(--primary)] ${status === 'deleted' ? 'line-through text-gray-400' : ''}`}
+                  className={`flex-1 min-w-0 bg-transparent text-sm font-bold text-[#1A1A1A] placeholder-gray-400 focus:outline-none py-1 border-b border-transparent focus:border-[var(--primary)] ${status === 'deleted' ? 'line-through text-gray-400' : ''}`}
                 />
 
                 {status === 'deleted' ? (
                   <button
                     onClick={() => handleRestoreCategory(cat.id)}
-                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                    className="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
                     title="Khôi phục"
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -171,7 +171,7 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
                 ) : (
                   <button
                     onClick={() => handleRemoveCategory(cat.id)}
-                    className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    className="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -183,7 +183,7 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
 
         <button
           onClick={handleAddCategory}
-          className="mt-6 w-full border-2 border-dashed border-gray-200 rounded-xl py-3 flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-[var(--primary)] hover:border-[var(--primary)]/30 hover:bg-[var(--primary)]/5 transition-all"
+          className="mt-6 w-full border-2 border-dashed border-gray-200 rounded-3xl py-3 flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-[var(--primary)] hover:border-[var(--primary)]/30 hover:bg-[var(--primary)]/5 transition-all"
         >
           <Plus className="w-4 h-4" />
           <span>Thêm danh mục</span>
@@ -191,19 +191,25 @@ export default function CategoryManagerModal({ categories, onUpdate, onClose, is
       </div>
 
       {/* Footer */}
-      <div className="p-6 border-t border-gray-100 bg-gray-50">
-        <button
+      <div className="p-3 border-t border-gray-100 bg-white rounded-b-3xl shrink-0">
+        <motion.button
+          whileTap={isSaving ? {} : { scale: 0.98 }}
           onClick={handleSave}
           disabled={isSaving}
-          className={`w-full bg-[var(--primary)] text-white py-3 rounded-xl font-bold uppercase tracking-wide shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
+          className={`w-full py-3.5 rounded-3xl font-bold text-base shadow-lg transition-all flex items-center justify-center gap-3 ${isSaving
+            ? "bg-gray-400 text-white cursor-not-allowed"
+            : "bg-lime-500 text-white shadow-lime-500/30 hover:bg-lime-600"
+            }`}
         >
           {isSaving ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            <Save className="w-4 h-4" />
+            <>
+              <span>Save Changes</span>
+              <Save className="w-5 h-5" />
+            </>
           )}
-          <span>{isSaving ? 'ĐANG LƯU...' : 'Lưu thay đổi'}</span>
-        </button>
+        </motion.button>
       </div>
     </div>
   );

@@ -336,7 +336,7 @@ export default function MobileOrderDrawer({
 
             {/* Sticky Actions Footer */}
             {hasFooter && (
-              <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3 rounded-t-3xl shrink-0 z-20">
+              <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3 rounded-t-[32px] shrink-0 z-20">
                 <AnimatePresence mode="wait">
                   {!showRejectReasons ? (
                     <motion.div
@@ -352,7 +352,7 @@ export default function MobileOrderDrawer({
                             whileTap={loading ? {} : { scale: 0.98 }}
                             onClick={handleConfirmOrder}
                             disabled={loading}
-                            className={`w-full py-3.5 rounded-2xl font-bold text-base shadow-lg flex items-center justify-center gap-3 transition-all ${loading
+                            className={`w-full py-3.5 rounded-3xl font-bold text-base shadow-lg flex items-center justify-center gap-3 transition-all ${loading
                               ? "bg-gray-400 text-white cursor-not-allowed"
                               : "bg-[#1A1A1A] text-white shadow-black/10 hover:bg-black group"
                               }`}
@@ -373,7 +373,7 @@ export default function MobileOrderDrawer({
                             whileTap={loading ? {} : { scale: 0.98 }}
                             onClick={handleRejectOrder}
                             disabled={loading}
-                            className="w-full py-3.5 rounded-2xl bg-white border-2 border-gray-200 text-gray-500 font-bold hover:bg-red-50 hover:border-red-100 hover:text-red-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-base"
+                            className="w-full py-3.5 rounded-3xl bg-white border-2 border-gray-200 text-gray-500 font-bold hover:bg-red-50 hover:border-red-100 hover:text-red-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-base"
                           >
                             <XCircle className="w-5 h-5" />
                             <span>Reject Order</span>
@@ -386,7 +386,7 @@ export default function MobileOrderDrawer({
                           whileTap={loading ? {} : { scale: 0.98 }}
                           onClick={handleCompleteOrder}
                           disabled={loading}
-                          className={`w-full py-3.5 rounded-2xl font-bold text-base shadow-lg transition-all flex items-center justify-center gap-3 ${loading
+                          className={`w-full py-3.5 rounded-3xl font-bold text-base shadow-lg transition-all flex items-center justify-center gap-3 ${loading
                             ? "bg-gray-400 text-white cursor-not-allowed"
                             : "bg-lime-500 text-white shadow-lime-500/30 hover:bg-lime-600"
                             }`}
@@ -408,7 +408,7 @@ export default function MobileOrderDrawer({
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}
-                      className="bg-white rounded-2xl border border-gray-100"
+                      className="bg-white rounded-3xl border border-gray-100"
                     >
                       <div className="flex items-center justify-between p-3 border-b border-gray-50">
                         <span className="font-bold text-gray-800 text-sm">Select Reason</span>
