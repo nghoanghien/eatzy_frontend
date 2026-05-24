@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from '@repo/ui/motion';
 import { useLoading, OrderCardShimmer, HistoryCardShimmer, useSwipeConfirmation } from '@repo/ui';
 import { sileo } from '@/components/DynamicIslandToast';
-import { ClipboardList, ChefHat, Bike, Power, Loader2 } from '@repo/ui/icons';
+import { ClipboardList, ChefHat, Bike, Power, Loader2, CheckCircle2 } from '@repo/ui/icons';
 import type { Order } from '@repo/types';
 import { orderApi } from '@repo/api';
 import OrderCard from '@/components/OrderCard';
@@ -388,6 +388,16 @@ export default function OrdersPage() {
                         />
                       ))}
                     </AnimatePresence>
+                    {pendingOrders.length > 0 && (
+                      <div className="pb-12 pt-6 flex items-center justify-center gap-4 opacity-40">
+                        <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+                        <div className="flex flex-col items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-gray-400" />
+                          <span className="text-[14px] font-bold text-gray-400 uppercase font-anton tracking-wider">End of list</span>
+                        </div>
+                        <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+                      </div>
+                    )}
                     {pendingOrders.length === 0 && (
                       <EmptyState
                         icon={ClipboardList}
@@ -418,6 +428,16 @@ export default function OrdersPage() {
                         />
                       ))}
                     </AnimatePresence>
+                    {inProgressOrders.length > 0 && (
+                      <div className="pb-12 pt-6 flex items-center justify-center gap-4 opacity-40">
+                        <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+                        <div className="flex flex-col items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-gray-400" />
+                          <span className="text-[14px] font-bold text-gray-400 uppercase font-anton tracking-wider">End of list</span>
+                        </div>
+                        <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+                      </div>
+                    )}
                     {inProgressOrders.length === 0 && (
                       <EmptyState
                         icon={ChefHat}
@@ -448,6 +468,16 @@ export default function OrdersPage() {
                         />
                       ))}
                     </AnimatePresence>
+                    {waitingForDriverOrders.length > 0 && (
+                      <div className="pb-12 pt-6 flex items-center justify-center gap-4 opacity-40">
+                        <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+                        <div className="flex flex-col items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-gray-400" />
+                          <span className="text-[14px] font-bold text-gray-400 uppercase font-anton tracking-wider">End of list</span>
+                        </div>
+                        <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+                      </div>
+                    )}
                     {waitingForDriverOrders.length === 0 && (
                       <EmptyState
                         icon={Bike}

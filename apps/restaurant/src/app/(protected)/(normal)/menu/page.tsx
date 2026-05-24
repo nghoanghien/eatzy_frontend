@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLoading, RestaurantMenuShimmer } from '@repo/ui';
+import { useLoading, RestaurantMenuShimmer, MobileMenuShimmer } from '@repo/ui';
 import { useMyRestaurantMenu, useMenuCategories } from '@/features/menu/hooks/useMenu';
 import DesktopMenu from '@/features/menu/components/DesktopMenu';
 import MobileMenu from '@/features/menu/components/MobileMenu';
@@ -57,6 +57,9 @@ export default function MenuPage() {
   }, [hide, isLoading]);
 
   if (isLoading) {
+    if (isMobile) {
+      return <MobileMenuShimmer />;
+    }
     return <RestaurantMenuShimmer />;
   }
 

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import { useSwipeConfirmation } from '@repo/ui';
 import { Dish, MenuCategory } from '@repo/types';
-import { Search, Plus, Settings, X } from '@repo/ui/icons';
+import { Search, Plus, Settings, X, CheckCircle2 } from '@repo/ui/icons';
 import MobileDishDrawer from './MobileDishDrawer';
 import CategoryManagerModal from './CategoryManagerModal';
 import MobileDishCard from './MobileDishCard';
@@ -320,6 +320,16 @@ export default function MobileMenu({
               </section>
             );
           })
+        )}
+        {filteredDishes.length > 0 && (
+          <div className="pb-12 pt-6 flex items-center justify-center gap-4 opacity-40">
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+            <div className="flex flex-col items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-gray-400" />
+              <span className="text-[14px] font-bold text-gray-400 uppercase font-anton tracking-wider">End of list</span>
+            </div>
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent w-20" />
+          </div>
         )}
         <div className="h-32 shrink-0"></div>
       </div>

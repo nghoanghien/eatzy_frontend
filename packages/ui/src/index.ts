@@ -43,6 +43,7 @@ export { default as FloatingRestaurantCartShimmer } from "./feedback/shimmer/Flo
 export { default as CheckoutShimmer } from "./feedback/shimmer/CheckoutShimmer";
 export { default as DriverOrderDetailDrawerShimmer } from "./feedback/shimmer/DriverOrderDetailDrawerShimmer";
 export { default as RestaurantMenuShimmer } from "./feedback/shimmer/RestaurantMenuShimmer";
+export { default as MobileMenuShimmer } from "./feedback/shimmer/MobileMenuShimmer";
 export { default as NumberInput } from "./forms/NumberInput";
 export { default as TimeInput } from "./forms/TimeInput";
 export { default as DateRangePicker } from "./forms/DateRangePicker";
