@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "@repo/ui/motion";
 import { FileText, X, Save, Edit2 } from "@repo/ui/icons";
 import { useSwipeConfirmation } from "@repo/ui";
@@ -9,15 +9,17 @@ interface StoreGeneralInfoEditProps {
   onSave: (updates: Partial<{ name: string; description: string; phone: string; email: string }>) => Promise<void>;
   onClose: () => void;
   layoutId?: string;
+  isMobile?: boolean;
 }
 
-export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId }: StoreGeneralInfoEditProps) {
+export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId, isMobile = false }: StoreGeneralInfoEditProps) {
   const [formData, setFormData] = useState({
     name: store.name,
     description: store.description || '',
     phone: store.phone || '',
     email: store.email || ''
   });
+
   const { confirm } = useSwipeConfirmation();
 
   const handleChange = (field: string, value: string | number) => {
@@ -25,7 +27,6 @@ export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId 
   };
 
   const handleSave = () => {
-    // Only send changed fields for partial update
     const updates: Record<string, any> = {};
     if (formData.name !== store.name) updates.name = formData.name;
     if (formData.description !== (store.description || '')) updates.description = formData.description;
@@ -51,48 +52,65 @@ export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId 
     });
   };
 
+  const animProps = isMobile ? {
+    initial: { y: "100%" },
+    animate: { y: 0 },
+    exit: { y: "100%" },
+    transition: { type: "spring", damping: 20, stiffness: 120 }
+  } : {
+    initial: { opacity: 0, scale: 0.9, y: 30 },
+    animate: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.9, y: 30 },
+    transition: { type: "spring", damping: 25, stiffness: 200 }
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9, y: 30 }}
-      transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      className="bg-white w-[600px] max-w-full rounded-[32px] p-8 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
+      {...animProps}
+      className={
+        isMobile
+          ? "bg-white w-full rounded-t-[32px] p-5 pb-10 shadow-2xl overflow-hidden flex flex-col h-[90vh] max-h-[90vh] fixed bottom-0 left-0 right-0 z-[210]"
+          : "bg-white w-[600px] max-w-full rounded-[32px] p-8 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
+      }
     >
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-anton font-bold text-[#1A1A1A] flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-            <FileText className="w-6 h-6" />
+      <div className="flex items-center justify-between mb-6 sm:mb-8 shrink-0">
+        <h2 className="text-xl sm:text-3xl font-anton font-bold text-[#1A1A1A] flex items-center gap-2 sm:gap-3">
+          <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${isMobile ? 'bg-[#1A1A1A] text-white' : 'bg-blue-50 text-blue-600'}`}>
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          EDIT GENERAL INFO
+          {isMobile ? 'Edit General Info' : 'EDIT GENERAL INFO'}
         </h2>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handleSave}
-            className="p-4 rounded-full font-bold bg-gray-100 text-gray-700 flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-all shadow-sm"
+            className="p-3 sm:p-4 rounded-full font-bold bg-gray-100 text-gray-700 flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-all shadow-sm"
           >
-            <Save className="w-5 h-5" />
+            <Save className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </button>
 
           <button
             onClick={onClose}
-            className="p-4 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            className="p-3 sm:p-4 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>
 
-      <div className="space-y-6 overflow-y-auto flex-1 pr-2">
+      <div className="space-y-5 sm:space-y-6 overflow-y-auto flex-1 pr-1 sm:pr-2">
         {/* Name */}
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Store Name</label>
+          <label className={isMobile ? "block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2" : "block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"}>
+            Store Name
+          </label>
           <div className="relative">
             <input
               type="text"
               value={formData.name}
               onChange={e => handleChange('name', e.target.value)}
-              className="w-full text-lg font-bold p-4 pr-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"
+              className={isMobile
+                ? "w-full text-base font-bold text-[#1A1A1A] p-3.5 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"
+                : "w-full text-base sm:text-lg font-bold p-3.5 sm:p-4 pr-12 bg-gray-50 rounded-2xl md:rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"}
             />
             <Edit2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
@@ -100,28 +118,36 @@ export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId 
 
         {/* Description */}
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Description</label>
+          <label className={isMobile ? "block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2" : "block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"}>
+            Description
+          </label>
           <div className="relative">
             <textarea
               value={formData.description}
               onChange={e => handleChange('description', e.target.value)}
-              rows={5}
-              className="w-full text-base p-4 pr-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all resize-none"
+              rows={isMobile ? 4 : 5}
+              className={isMobile
+                ? "w-full text-sm font-bold text-[#1A1A1A] p-3.5 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all resize-none"
+                : "w-full text-sm sm:text-base p-3.5 sm:p-4 pr-12 bg-gray-50 rounded-2xl md:rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all resize-none"}
             />
             <Edit2 className="absolute right-4 top-4 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {/* Phone */}
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Phone Number</label>
+            <label className={isMobile ? "block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2" : "block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"}>
+              Phone Number
+            </label>
             <div className="relative">
               <input
                 type="tel"
                 value={formData.phone}
                 onChange={e => handleChange('phone', e.target.value)}
-                className="w-full font-medium p-4 pr-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"
+                className={isMobile
+                  ? "w-full text-sm font-bold text-[#1A1A1A] p-3.5 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"
+                  : "w-full font-medium p-3.5 sm:p-4 pr-12 bg-gray-50 rounded-2xl md:rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"}
               />
               <Edit2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
@@ -129,21 +155,23 @@ export default function StoreGeneralInfoEdit({ store, onSave, onClose, layoutId 
 
           {/* Email */}
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Email</label>
+            <label className={isMobile ? "block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2" : "block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"}>
+              Email
+            </label>
             <div className="relative">
               <input
                 type="email"
                 value={formData.email}
                 onChange={e => handleChange('email', e.target.value)}
-                className="w-full font-medium p-4 pr-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"
+                className={isMobile
+                  ? "w-full text-sm font-bold text-[#1A1A1A] p-3.5 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"
+                  : "w-full font-medium p-3.5 sm:p-4 pr-12 bg-gray-50 rounded-2xl md:rounded-xl border-2 border-dashed border-gray-300 focus:border-[var(--primary)] focus:border-solid focus:bg-white outline-none transition-all"}
               />
               <Edit2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
           </div>
         </div>
       </div>
-
-
     </motion.div>
   );
 }

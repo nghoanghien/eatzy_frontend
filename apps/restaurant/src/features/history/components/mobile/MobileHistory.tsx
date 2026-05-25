@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { motion } from '@repo/ui/motion';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { motion, AnimatePresence } from '@repo/ui/motion';
 import { Search, Filter, X, FileText, CheckCircle2, AlertCircle } from '@repo/ui/icons';
 import { PullToRefresh, HistoryCardShimmer } from '@repo/ui';
 import { useInfiniteScroll } from '@repo/hooks';
@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import MobileHistoryCard from './MobileHistoryCard';
 import MobileHistoryDrawer from './MobileHistoryDrawer';
 import OrderHistoryFilterModal from '../OrderHistoryFilterModal';
+import { useBottomNav } from '@/app/(protected)/(normal)/context/BottomNavContext';
 
 interface MobileHistoryProps {
   data: OrderHistoryItem[];
@@ -43,6 +44,36 @@ export default function MobileHistory({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderHistoryItem | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { setIsVisible } = useBottomNav();
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const currentScrollY = container.scrollTop;
+      const diff = currentScrollY - lastScrollY.current;
+      lastScrollY.current = currentScrollY;
+
+      if (Math.abs(diff) < 3) return;
+
+      if (diff > 5 && currentScrollY > 20) {
+        setIsVisible(false);
+      } else if (diff < -5) {
+        setIsVisible(true);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      setIsVisible(true);
+    };
+  }, [setIsVisible]);
 
   // Filter fields matching desktop view
   const [filterFields, setFilterFields] = useState({
@@ -152,59 +183,105 @@ export default function MobileHistory({
   return (
     <div className="h-screen flex flex-col bg-[#F7F7F7] overflow-hidden md:hidden">
       {/* Sticky Header & Search area */}
-      <div className="absolute top-0 left-0 right-0 z-30 bg-[#F7F7F7]/85 backdrop-blur-md px-4 pt-4 pb-10 max-md:[mask-image:linear-gradient(to_bottom,black_84%,transparent)]">
-        <div className="flex items-center justify-between mb-4 px-1">
-          <div>
-            <h1 className="text-2xl font-anton font-bold text-gray-900 uppercase tracking-tight leading-none">
-              ORDER HISTORY
-            </h1>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsFilterOpen(true)}
-              className={`relative w-10 h-10 rounded-2xl border-2 flex items-center justify-center shadow-md transition-colors ${activeFiltersCount > 0
-                ? 'bg-lime-500 border-lime-400 text-white shadow-lime-500/20'
-                : 'bg-gray-200/70 border-gray-200 text-gray-400'
-                }`}
-              title="Filter Options"
+      <div className="absolute top-0 left-0 right-0 z-30 bg-[#F7F7F7]/85 backdrop-blur-md px-4 pt-5 pb-4 max-md:[mask-image:linear-gradient(to_bottom,black_90%,transparent)]">
+        <AnimatePresence mode="popLayout">
+          {isSearchOpen ? (
+            <motion.div
+              key="search-bar"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center gap-2 w-full px-1"
             >
-              <Filter size={20} strokeWidth={2.8} />
-              {activeFiltersCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-scale-in">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </motion.button>
-          </div>
-        </div>
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Search ID or Customer..."
+                  value={searchInputValue}
+                  onChange={(e) => setSearchInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      onSearch(searchInputValue);
+                    }
+                  }}
+                  className="w-full pl-9 pr-9 py-2 bg-gray-200/70 border border-gray-250 rounded-2xl text-xs font-bold text-gray-900 outline-none focus:border-lime-500 focus:bg-white transition-all placeholder:text-gray-400 shadow-sm"
+                />
+                {searchInputValue && (
+                  <button
+                    onClick={() => {
+                      setSearchInputValue("");
+                      onSearch("");
+                    }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-gray-300/60 text-gray-500 hover:bg-gray-400 hover:text-gray-700 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setIsSearchOpen(false);
+                  setSearchInputValue("");
+                  onSearch("");
+                }}
+                className="text-xs font-bold text-gray-500 hover:text-gray-950 transition-colors px-2 py-2"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="header-default"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="flex items-center justify-between w-full px-1"
+            >
+              <div>
+                <h1 className="text-2xl font-anton font-bold text-gray-900 uppercase tracking-tight leading-none">
+                  ORDER HISTORY
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsSearchOpen(true)}
+                  className={`relative w-10 h-10 rounded-2xl border-2 flex items-center justify-center shadow-md transition-colors ${searchInputValue
+                    ? 'bg-lime-500 border-lime-400 text-white shadow-lime-500/20'
+                    : 'bg-gray-200/70 border-gray-200 text-gray-400'
+                    }`}
+                  title="Search Options"
+                >
+                  <Search size={20} strokeWidth={2.8} />
+                </motion.button>
 
-        {/* Search Bar - Styled exactly like menu search bar */}
-        <div className="relative group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--primary)] transition-colors pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search ID or Customer..."
-            value={searchInputValue}
-            onChange={(e) => setSearchInputValue(e.target.value)}
-            className="w-full bg-slate-50 border-2 border-white focus:border-[var(--primary)]/20 rounded-3xl py-4 pl-14 pr-12 text-base font-bold font-anton text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-[var(--primary)]/5 transition-all shadow-[inset_0_0_20px_rgba(0,0,0,0.09)]"
-          />
-          {searchInputValue && (
-            <button
-              onClick={() => {
-                setSearchInputValue("");
-                onSearch("");
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-gray-200/50 hover:bg-gray-200 text-gray-500 hover:text-gray-700 flex items-center justify-center transition-all"
-            >
-              <X className="w-4 h-4" />
-            </button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsFilterOpen(true)}
+                  className={`relative w-10 h-10 rounded-2xl border-2 flex items-center justify-center shadow-md transition-colors ${activeFiltersCount > 0
+                    ? 'bg-lime-500 border-lime-400 text-white shadow-lime-500/20'
+                    : 'bg-gray-200/70 border-gray-200 text-gray-400'
+                    }`}
+                  title="Filter Options"
+                >
+                  <Filter size={20} strokeWidth={2.8} />
+                  {activeFiltersCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-scale-in">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </motion.button>
+              </div>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
 
       {/* Main Order List with Pull to Refresh & Infinite Scroll */}
       <PullToRefresh
+        ref={scrollContainerRef}
         onRefresh={async () => {
           onRefresh();
         }}
@@ -213,7 +290,7 @@ export default function MobileHistory({
         releaseText="Thả tay để cập nhật"
         refreshingText="Đang tải..."
       >
-        <div className="p-3.5 pt-[152px] space-y-3 pb-32 relative">
+        <div className="p-3.5 pt-20 space-y-3 pb-32 relative">
           {isError ? (
             <EmptyState
               icon={AlertCircle}

@@ -255,13 +255,17 @@ function RestaurantLayoutContent({ children }: { children: ReactNode }) {
   );
 }
 
+import { BottomNavProvider } from './context/BottomNavContext';
+
 export default function NormalLayout({ children }: { children: ReactNode }) {
   return (
     <NormalLoadingProvider>
-      <div className="relative">
-        <RestaurantLayoutContent>{children}</RestaurantLayoutContent>
-        <NormalLoadingOverlay />
-      </div>
+      <BottomNavProvider>
+        <div className="relative">
+          <RestaurantLayoutContent>{children}</RestaurantLayoutContent>
+          <NormalLoadingOverlay />
+        </div>
+      </BottomNavProvider>
     </NormalLoadingProvider>
   );
 }

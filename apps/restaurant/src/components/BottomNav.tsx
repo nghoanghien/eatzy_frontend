@@ -13,11 +13,20 @@ import {
   Wallet,
   User,
 } from '@repo/ui/icons';
+import { useBottomNav } from '@/app/(protected)/(normal)/context/BottomNavContext';
 
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  let isVisible = true;
+  try {
+    const context = useBottomNav();
+    isVisible = context.isVisible;
+  } catch (e) {
+    // Ignore context error if used outside provider
+  }
 
   const tabs = [
     { id: 'orders', icon: ShoppingCart, text: 'Đơn hàng', path: '/orders' },
@@ -52,8 +61,8 @@ export default function BottomNav() {
       <motion.div
         className="pointer-events-auto backdrop-blur-xl bg-white/70 text-black rounded-[32px] border border-white/40 px-2 py-1 shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 flex items-center justify-between overflow-hidden w-full relative"
         initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, type: 'spring', damping: 20 }}
+        animate={{ y: isVisible ? 0 : 120, opacity: isVisible ? 1 : 0 }}
+        transition={{ duration: 0.4, type: 'spring', damping: 22, stiffness: 150 }}
       >
         {/* Soft edge fade indicator for horizontal scroll */}
         <div className="absolute left-2 top-0 bottom-0 w-6 bg-gradient-to-r from-white/20 to-transparent pointer-events-none z-20" />

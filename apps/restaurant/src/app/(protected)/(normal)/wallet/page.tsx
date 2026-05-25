@@ -5,14 +5,22 @@ import WalletStatsCards from '@/features/wallet/components/WalletStatsCards';
 import WalletTransactionTable from '@/features/wallet/components/WalletTransactionTable';
 import WalletBankInfo from '@/features/wallet/components/WalletBankInfo';
 import WithdrawModal from '@/features/wallet/components/WithdrawModal';
+import MobileWallet from '@/features/wallet/components/mobile/MobileWallet';
+import MobileHistoryDrawer from '@/features/history/components/mobile/MobileHistoryDrawer';
+import { useOrderDetail } from '@/features/history/hooks/useOrderDetail';
 import { sileo } from '@/components/DynamicIslandToast';
 import { ChevronLeft, ChevronRight, Wallet } from '@repo/ui/icons';
 import { useMyWallet, useWalletTransactions, type WalletSearchFields } from '@/features/wallet/hooks';
 
 export default function WalletPage() {
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Order Details states (for mobile transaction linking)
+  const { order, isLoading: isOrderLoading, fetchOrder, clearOrder } = useOrderDetail();
+  const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false);
 
   // Search and Filter state (lifted up from Table)
   const [searchFields, setSearchFields] = useState<WalletSearchFields>({ id: '', description: '' });
@@ -25,6 +33,15 @@ export default function WalletPage() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Use hook with search and filter params (server-side)
@@ -45,7 +62,6 @@ export default function WalletPage() {
   } = useMyWallet();
 
   const isLoading = isLoadingTransactions || isLoadingWallet;
-
 
   // Check scroll state on mount and resize
   useEffect(() => {
@@ -91,7 +107,10 @@ export default function WalletPage() {
     });
   };
 
-
+  const handleViewOrder = (orderId: number) => {
+    fetchOrder(orderId);
+    setIsOrderDrawerOpen(true);
+  };
 
   // Handle search field change
   const handleSearchChange = (key: string, value: string) => {
@@ -104,6 +123,37 @@ export default function WalletPage() {
   };
 
   if (!mounted) return null;
+
+  if (isMobile) {
+    return (
+      <>
+        <MobileWallet
+          onWithdraw={() => setIsWithdrawModalOpen(true)}
+          onViewOrder={handleViewOrder}
+          isOrderLoading={isOrderLoading}
+          order={order}
+        />
+
+        <WithdrawModal
+          isOpen={isWithdrawModalOpen}
+          onClose={() => setIsWithdrawModalOpen(false)}
+          onConfirm={handleWithdrawConfirm}
+          maxBalance={balance}
+        />
+
+        <MobileHistoryDrawer
+          open={isOrderDrawerOpen}
+          order={order}
+          onClose={() => {
+            setIsOrderDrawerOpen(false);
+            setTimeout(() => {
+              clearOrder();
+            }, 300);
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] pb-32">

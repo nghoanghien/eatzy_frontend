@@ -121,16 +121,25 @@ export default function ReportHeader({
 }: ReportHeaderProps) {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isTabSelectOpen, setIsTabSelectOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
+  const datePickerMobileRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
+  const tabSelectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+      if (
+        (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) &&
+        (datePickerMobileRef.current && !datePickerMobileRef.current.contains(event.target as Node))
+      ) {
         setIsDatePickerOpen(false);
       }
       if (exportRef.current && !exportRef.current.contains(event.target as Node)) {
         setIsExportOpen(false);
+      }
+      if (tabSelectRef.current && !tabSelectRef.current.contains(event.target as Node)) {
+        setIsTabSelectOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -145,68 +154,31 @@ export default function ReportHeader({
     { id: 'reviews' as ReportTab, label: 'Reviews', icon: Star },
   ];
 
+  const activeTabIconObj = tabs.find(t => t.id === activeTab) || tabs[0];
+  const ActiveTabIcon = activeTabIconObj.icon;
+
   return (
-    <div className="mb-8">
-      {/* Top Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 mb-1"
-          >
-            <span className="px-2 py-0.5 rounded-md bg-lime-100 text-lime-700 text-[10px] font-bold uppercase tracking-wider">
-              Restaurant Analytics
-            </span>
-          </motion.div>
-          <h1 className="text-4xl md:text-5xl font-anton text-gray-900 uppercase tracking-tight">
-            Reports Center
-          </h1>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Month Picker Trigger */}
-          <div className="relative" ref={datePickerRef}>
-            <button
-              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-              className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-gray-200 shadow-sm hover:border-lime-200 hover:shadow-md transition-all group"
-            >
-              <div className="p-1.5 rounded-lg bg-gray-50 text-gray-400 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
-                <Calendar className="w-4 h-4" />
-              </div>
-              <div className="flex flex-col items-start min-w-[120px]">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-lime-600">Period</span>
-                <span className="text-sm font-bold text-gray-900 leading-tight">
-                  {format(startDate, 'MMMM yyyy', { locale: vi })}
-                </span>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDatePickerOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            <AnimatePresence>
-              {isDatePickerOpen && (
-                <div className="absolute top-full right-0 mt-2 z-50">
-                  <MonthPicker
-                    currentDate={startDate}
-                    onClose={() => setIsDatePickerOpen(false)}
-                    onSelect={onDateChange}
-                  />
-                </div>
-              )}
-            </AnimatePresence>
+    <>
+      {/* ========================================================================= */}
+      {/* MOBILE-ONLY HEADER & ACTIONS BAR                                          */}
+      {/* ========================================================================= */}
+      <div className={`sticky top-0 z-50 bg-[#F7F7F7]/85 backdrop-blur-md pt-4 pb-4 px-4 -mx-4 md:hidden flex flex-col transition-all duration-200 ${!isDatePickerOpen && !isTabSelectOpen && !isExportOpen ? 'max-md:[mask-image:linear-gradient(to_bottom,black_90%,transparent)]' : ''}`}>
+        {/* Title & Download Button Row */}
+        <div className="flex items-center justify-between mb-3 pl-2 shrink-0">
+          <div>
+            <h1 className="text-2xl font-bold leading-tight text-[#1A1A1A] font-anton uppercase tracking-tight">
+              REPORTS CENTER
+            </h1>
           </div>
 
-          {/* Export Dropdown */}
-          <div className="relative" ref={exportRef}>
+          {/* Download Action Trigger (Square, Inset Shadow) */}
+          <div className="relative shrink-0" ref={exportRef}>
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsExportOpen(!isExportOpen)}
-              className="flex items-center gap-2 bg-[#1A1A1A] text-white pl-4 pr-3 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-black/10 hover:shadow-xl transition-all"
+              className="w-10 h-10 rounded-[20px] border-2 border-white bg-slate-50 text-gray-600 shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] hover:border-[var(--primary)]/20 flex items-center justify-center transition-all"
             >
-              <span>Export Report</span>
-              <div className="w-px h-4 bg-white/20 mx-1"></div>
-              <ChevronDown className={`w-4 h-4 transition-transform ${isExportOpen ? 'rotate-180' : ''}`} />
+              <Download className="w-4 h-4 text-gray-600" />
             </motion.button>
 
             <AnimatePresence>
@@ -246,36 +218,229 @@ export default function ReportHeader({
             </AnimatePresence>
           </div>
         </div>
-      </div>
 
-      {/* Tabs Navigation */}
-      <div className="bg-gray-100/50 p-1.5 rounded-2xl inline-flex flex-wrap gap-1">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-
-          return (
+        {/* Month Picker & Tab Select Dropdown Row */}
+        <div className="flex items-center gap-1 mb-2 w-full">
+          {/* Period Selector */}
+          <div className="w-[55%] relative" ref={datePickerMobileRef}>
             <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className="relative px-5 py-2.5 rounded-xl text-sm font-bold transition-all outline-none md:flex-1 md:min-w-[120px]"
+              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+              className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-[20px] border-2 border-white shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] hover:border-[var(--primary)]/20 transition-all group w-full justify-between text-left"
             >
-              {isActive && (
-                <motion.div
-                  layoutId="activeTabBg"
-                  className="absolute inset-0 bg-white shadow-sm border border-gray-100 rounded-xl"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-
-              <span className={`relative z-10 flex items-center justify-center gap-2 whitespace-nowrap ${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-lime-600' : ''}`} />
-                {tab.label}
-              </span>
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="p-1.5 rounded-lg bg-gray-100 text-gray-404 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors shrink-0">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col items-start min-w-0">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-lime-600">Period</span>
+                  <span className="text-xs font-bold text-gray-900 leading-tight truncate">
+                    {format(startDate, 'MMMM yyyy', { locale: vi })}
+                  </span>
+                </div>
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isDatePickerOpen ? 'rotate-180' : ''}`} />
             </button>
-          );
-        })}
+
+            <AnimatePresence>
+              {isDatePickerOpen && (
+                <div className="absolute top-full left-0 mt-2 z-50">
+                  <MonthPicker
+                    currentDate={startDate}
+                    onClose={() => setIsDatePickerOpen(false)}
+                    onSelect={onDateChange}
+                  />
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Tab Selector */}
+          <div className="w-[45%] relative" ref={tabSelectRef}>
+            <button
+              onClick={() => setIsTabSelectOpen(!isTabSelectOpen)}
+              className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-[20px] border-2 border-white shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] hover:border-[var(--primary)]/20 transition-all group w-full justify-between text-left"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="p-1.5 rounded-lg bg-gray-100 text-gray-404 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors shrink-0">
+                  <ActiveTabIcon className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col items-start min-w-0">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-lime-600">Report</span>
+                  <span className="text-xs font-bold text-gray-900 leading-tight truncate">
+                    {activeTabIconObj.label}
+                  </span>
+                </div>
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${isTabSelectOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {isTabSelectOpen && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  className="absolute right-0 top-full mt-2 w-36 bg-white backdrop-blur-xl rounded-[24px] shadow-xl border border-gray-100 z-50 overflow-hidden py-1.5"
+                >
+                  {tabs.map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        onTabChange(tab.id);
+                        setIsTabSelectOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-xs font-bold transition-all ${activeTab === tab.id
+                        ? 'bg-lime-50 text-lime-700'
+                        : 'text-gray-650 hover:bg-gray-50'
+                        }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* ========================================================================= */}
+      {/* DESKTOP-ONLY HEADER & ACTIONS BAR                                         */}
+      {/* ========================================================================= */}
+
+      <div className="hidden md:block mb-6 md:mb-8">
+        {/* Top Bar */}
+        <div className="flex flex-row items-center justify-between gap-4 mb-6 md:mb-8">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-2 mb-1"
+            >
+              <span className="px-2 py-0.5 rounded-md bg-lime-100 text-lime-700 text-[10px] font-bold uppercase tracking-wider">
+                Restaurant Analytics
+              </span>
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-anton text-gray-900 uppercase tracking-tight">
+              Reports Center
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Month Picker Trigger */}
+            <div className="relative" ref={datePickerRef}>
+              <button
+                onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-gray-200 shadow-sm hover:border-lime-200 hover:shadow-md transition-all group"
+              >
+                <div className="p-1.5 rounded-lg bg-gray-50 text-gray-400 group-hover:bg-lime-50 group-hover:text-lime-600 transition-colors">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col items-start min-w-[120px]">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-lime-600">Period</span>
+                  <span className="text-sm font-bold text-gray-900 leading-tight">
+                    {format(startDate, 'MMMM yyyy', { locale: vi })}
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDatePickerOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {isDatePickerOpen && (
+                  <div className="absolute top-full right-0 mt-2 z-50">
+                    <MonthPicker
+                      currentDate={startDate}
+                      onClose={() => setIsDatePickerOpen(false)}
+                      onSelect={onDateChange}
+                    />
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Export Dropdown */}
+            <div className="relative" ref={exportRef}>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setIsExportOpen(!isExportOpen)}
+                className="flex items-center gap-2 bg-[#1A1A1A] text-white pl-4 pr-3 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-black/10 hover:shadow-xl transition-all"
+              >
+                <span>Export Report</span>
+                <div className="w-px h-4 bg-white/20 mx-1"></div>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isExportOpen ? 'rotate-180' : ''}`} />
+              </motion.button>
+
+              <AnimatePresence>
+                {isExportOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden z-40 p-1"
+                  >
+                    <button
+                      onClick={() => { onExport('excel'); setIsExportOpen(false); }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <div className="p-1.5 rounded-lg bg-green-50 text-green-600">
+                        <FileSpreadsheet className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="block text-sm font-bold text-gray-900">Excel</span>
+                        <span className="block text-[10px] font-medium text-gray-400">Spreadsheet .xlsx</span>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => { onExport('pdf'); setIsExportOpen(false); }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <div className="p-1.5 rounded-lg bg-red-50 text-red-600">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="block text-sm font-bold text-gray-900">PDF</span>
+                        <span className="block text-[10px] font-medium text-gray-400">Document .pdf</span>
+                      </div>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Tabs Navigation */}
+        <div className="hidden md:block w-full mb-8">
+          <div className="bg-gray-100/50 p-1.5 rounded-2xl inline-flex flex-wrap gap-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className="relative px-5 py-2.5 rounded-xl text-sm font-bold transition-all outline-none md:flex-1 md:min-w-[120px]"
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabBg"
+                      className="absolute inset-0 bg-white shadow-sm border border-gray-100 rounded-xl"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+
+                  <span className={`relative z-10 flex items-center justify-center gap-2 whitespace-nowrap ${isActive ? 'text-[#1A1A1A]' : 'text-gray-500 hover:text-gray-700'}`}>
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-lime-600' : ''}`} />
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

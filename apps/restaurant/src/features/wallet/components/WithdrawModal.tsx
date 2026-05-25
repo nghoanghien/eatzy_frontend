@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import { X, ChevronRight, ChevronLeft, AlertTriangle, Wallet } from '@repo/ui/icons';
 import { SwipeToConfirm } from '@repo/ui';
@@ -14,6 +15,30 @@ interface WithdrawModalProps {
 
 export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance = 0 }: WithdrawModalProps) {
   const [step, setStep] = useState<'input' | 'confirm'>('input');
+  const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
   const [amountStr, setAmountStr] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -50,31 +75,34 @@ export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance =
   const currentAmount = parseInt(amountStr.replace(/\D/g, ''), 10) || 0;
   const isValid = currentAmount >= 50000 && currentAmount <= maxAmount;
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-6 pointer-events-none">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto"
           />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            initial={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95, y: 20 }}
+            animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95, y: 20 }}
+            transition={isMobile ? { type: "spring", damping: 18, stiffness: 100 } : undefined}
+            className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden flex flex-col h-[80vh] sm:h-auto max-h-[90vh] pointer-events-auto"
           >
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white z-10">
+            <div className="p-4 px-6 md:p-6 border-b border-gray-100 flex items-center justify-between bg-white z-10">
               <div>
-                <h3 className="text-3xl font-bold font-anton uppercase text-[#1A1A1A]">Withdraw Funds</h3>
-                <p className="text-sm text-gray-500">Fast payouts to your linked bank account</p>
+                <h3 className="text-2xl md:text-3xl font-extrabold font-anton uppercase text-[#1A1A1A]">Withdraw Funds</h3>
+                <p className="hidden md:block text-sm text-gray-500">Fast payouts to your linked bank account</p>
               </div>
-              <button onClick={onClose} className="p-2 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors">
+              <button onClick={onClose} className="p-2 rounded-full bg-gray-100 hover:bg-gray-100 transition-colors">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
@@ -96,13 +124,13 @@ export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance =
                           <Wallet className="w-5 h-5 text-gray-600" />
                         </div>
                         <div>
-                          <div className="text-xs text-gray-500 font-bold uppercase tracking-wider">Available Balance</div>
-                          <div className="text-lg font-bold text-[#1A1A1A]">{formatCurrency(maxAmount)}</div>
+                          <div className="text-xs text-gray-500 font-bold uppercase tracking-tight md:tracking-wider">Available Balance</div>
+                          <div className="text-lg font-bold text-[#1A1A1A] tracking-tight">{formatCurrency(maxAmount)}</div>
                         </div>
                       </div>
                       <button
                         onClick={() => setAmountStr(new Intl.NumberFormat('vi-VN').format(maxAmount))}
-                        className="h-9 px-4 flex items-center gap-1.5 rounded-xl bg-white border border-gray-200 shadow-sm text-xs font-bold text-gray-900 hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-all"
+                        className="h-9 px-4 hidden md:flex items-center gap-1.5 rounded-xl bg-white border border-gray-200 shadow-sm text-xs font-bold text-gray-900 hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-all"
                       >
                         <span className="text-amber-500">⚡</span>
                         WITHDRAW ALL
@@ -168,7 +196,7 @@ export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance =
                     <button
                       disabled={!isValid}
                       onClick={handleNext}
-                      className="w-full py-4 bg-[var(--primary)] text-white rounded-2xl font-semibold font-anton text-3xl disabled:bg-gray-300 disabled:cursor-not-allowed hover:opacity-70 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
+                      className="w-full py-4 bg-[var(--primary)] text-white rounded-3xl md:rounded-2xl font-semibold font-anton text-3xl disabled:bg-gray-300 disabled:cursor-not-allowed hover:opacity-70 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
                     >
                       NEXT STEP <ChevronRight className="w-8 h-8" />
                     </button>
@@ -182,7 +210,7 @@ export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance =
                     className="space-y-6 pt-4"
                   >
                     <div className="text-center space-y-2 mb-8">
-                      <div className="text-sm font-medium text-gray-500 uppercase tracking-widest">Total Withdrawal</div>
+                      <div className="text-sm font-medium text-gray-500 uppercase tracking-tight md:tracking-widest">Total Withdrawal</div>
                       <div className="text-5xl font-anton text-[#1A1A1A] tracking-tight">
                         {formatCurrency(currentAmount)}
                       </div>
@@ -190,15 +218,15 @@ export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance =
 
                     <div className="bg-gray-50 rounded-2xl p-4 space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-500">To Account</span>
-                        <span className="font-medium text-gray-900">Vietcombank •••• 9988</span>
+                        <span className="text-gray-500 font-semibold">To Account</span>
+                        <span className="font-semibold text-gray-900">Vietcombank •••• 9988</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Fee</span>
-                        <span className="font-medium text-gray-900">0đ (Free)</span>
+                        <span className="text-gray-500 font-semibold">Fee</span>
+                        <span className="font-semibold text-gray-900">0đ (Free)</span>
                       </div>
                       <div className="border-t border-gray-200 my-2 pt-2 flex justify-between">
-                        <span className="text-gray-500">Estimated Arrival</span>
+                        <span className="text-gray-500 font-semibold">Estimated Arrival</span>
                         <span className="font-bold text-green-600">Instantly</span>
                       </div>
                     </div>
@@ -220,7 +248,7 @@ export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance =
                     {!isProcessing && !isCompleted && (
                       <button
                         onClick={() => setStep('input')}
-                        className="w-full py-3 text-gray-500 hover:text-gray-800 font-bold uppercase tracking-wide transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-3 text-gray-500 hover:text-gray-800 font-bold uppercase tracking-tight md:tracking-wide transition-colors flex items-center justify-center gap-2"
                       >
                         <ChevronLeft className="w-5 h-5" />
                         Back to change amount
@@ -233,6 +261,7 @@ export default function WithdrawModal({ isOpen, onClose, onConfirm, maxBalance =
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

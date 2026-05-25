@@ -31,6 +31,14 @@ interface WalletFilterModalProps {
 export default function WalletFilterModal({ isOpen, onClose, filterFields, onApply }: WalletFilterModalProps) {
   const [localFilters, setLocalFilters] = useState(filterFields);
   const [sliderBounds, setSliderBounds] = useState({ min: -100000000, max: 100000000 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -102,25 +110,25 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
             className="fixed inset-0 bg-black/50 backdrop-blur-md z-[60]"
           />
 
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 md:p-8 pointer-events-none">
+          <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-center p-0 md:p-8 pointer-events-none">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="bg-[#F8F9FA] w-[1100px] max-w-[98vw] rounded-[48px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] relative overflow-hidden flex flex-col max-h-[95vh] border border-gray-100 pointer-events-auto"
+              initial={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.9, y: 30 }}
+              animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+              exit={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.9, y: 30 }}
+              transition={isMobile ? { type: "spring", damping: 18, stiffness: 100 } : { type: "spring", damping: 25, stiffness: 200 }}
+              className="bg-[#F8F9FA] w-full md:w-[1100px] max-w-full md:max-w-[98vw] rounded-t-[32px] md:rounded-[48px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] relative overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[92vh] md:max-h-[95vh] border-t md:border border-gray-150 pointer-events-auto"
             >
               {/* Header */}
-              <div className="relative px-9 py-6 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
+              <div className="relative px-6 py-5 md:px-9 md:py-6 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
                 <div>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[#1A1A1A] text-white flex items-center justify-center shadow-lg shadow-black/10">
-                      <Filter className="w-6 h-6" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#1A1A1A] text-white flex items-center justify-center shadow-lg shadow-black/10">
+                      <Filter className="w-5 h-5 md:w-6 md:h-6" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-anton font-bold text-[#1A1A1A] tracking-tight uppercase">Transaction Filters</h2>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Refine wallet history</span>
+                      <h2 className="text-xl md:text-2xl font-anton font-bold text-[#1A1A1A] tracking-tight uppercase leading-none">Transaction Filters</h2>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] hidden sm:inline">Refine wallet history</span>
                         {activeCount > 0 && (
                           <span className="flex items-center gap-1.5 text-[10px] font-bold text-lime-700 bg-lime-100 px-2 py-0.5 rounded-full border border-lime-200">
                             <div className="w-1 h-1 rounded-full bg-lime-600 animate-pulse"></div>
@@ -136,7 +144,7 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
                   {activeCount > 0 && (
                     <button
                       onClick={handleReset}
-                      className="group flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white text-gray-400 font-bold text-xs border border-gray-100 shadow-sm hover:text-red-600 hover:border-red-100 hover:bg-red-50 transition-all duration-300"
+                      className="hidden md:flex group items-center gap-2 px-5 py-3.5 rounded-2xl bg-white text-gray-400 font-bold text-xs border border-gray-100 shadow-sm hover:text-red-600 hover:border-red-100 hover:bg-red-50 transition-all duration-300"
                     >
                       <RotateCcw className="w-4 h-4 group-hover:rotate-[-120deg] transition-transform duration-500" />
                       RESET ALL
@@ -145,25 +153,25 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
 
                   <button
                     onClick={handleApply}
-                    className="flex items-center gap-2 px-8 py-4 rounded-3xl bg-lime-500 text-white font-bold text-sm tracking-widest hover:bg-lime-600 transition-all shadow-[0_8px_30px_rgba(132,204,22,0.3)] hover:shadow-lime-300 hover:-translate-y-1 active:scale-95"
+                    className="hidden md:flex items-center gap-2 px-8 py-4 rounded-3xl bg-lime-500 text-white font-bold text-sm tracking-widest hover:bg-lime-600 transition-all shadow-[0_8px_30px_rgba(132,204,22,0.3)] hover:shadow-lime-300 hover:-translate-y-1 active:scale-95"
                   >
                     <Check className="w-5 h-5" strokeWidth={3} />
                     APPLY FILTERS
                   </button>
 
-                  <div className="w-px h-10 bg-gray-200 ml-2 mr-2"></div>
+                  <div className="hidden md:block w-px h-10 bg-gray-200 ml-2 mr-2"></div>
 
                   <button
                     onClick={onClose}
-                    className="p-4 rounded-full bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:shadow-lg transition-all"
+                    className="p-3 md:p-4 rounded-full bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:shadow-lg transition-all"
                   >
-                    <X className="w-6 h-6" />
+                    <X className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
                 </div>
               </div>
 
               {/* Body */}
-              <div className="flex-1 overflow-y-auto p-10 space-y-12">
+              <div className="flex-1 overflow-y-auto p-5 md:p-10 space-y-12">
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
 
                   {/* Left Column: Date and Amount */}
@@ -172,7 +180,7 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
                     {/* Date Range */}
                     <div className="space-y-5">
                       <div className="flex items-center gap-3 px-2">
-                        <div className="w-11 h-11 rounded-2xl bg-[#EEF2FF] text-indigo-600 flex items-center justify-center border border-indigo-100 shadow-sm">
+                        <div className="w-11 h-11 rounded-2xl bg-lime-50 text-lime-600 flex items-center justify-center border border-lime-100 shadow-sm">
                           <Calendar size={22} strokeWidth={2.5} />
                         </div>
                         <div>
@@ -191,7 +199,7 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
                     {/* Amount Range Slider */}
                     <div className="space-y-5">
                       <div className="flex items-center gap-3 px-2">
-                        <div className="w-11 h-11 rounded-2xl bg-[#FFF7ED] text-orange-600 flex items-center justify-center border border-orange-100 shadow-sm">
+                        <div className="w-11 h-11 rounded-2xl bg-lime-50 text-lime-600 flex items-center justify-center border border-lime-100 shadow-sm">
                           <Banknote size={22} strokeWidth={2.5} />
                         </div>
                         <div>
@@ -215,7 +223,7 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
                     {/* Section: Status Selection */}
                     <div className="space-y-5">
                       <div className="flex items-center gap-3 px-2">
-                        <div className="w-11 h-11 rounded-2xl bg-[#F0FDF4] text-lime-600 flex items-center justify-center border border-lime-100 shadow-sm">
+                        <div className="w-11 h-11 rounded-2xl bg-lime-50 text-lime-600 flex items-center justify-center border border-lime-100 shadow-sm">
                           <CheckCircle size={22} strokeWidth={2.5} />
                         </div>
                         <div>
@@ -279,7 +287,7 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
                     </div>
 
                     {/* Decorative Info Card moved here */}
-                    <motion.div
+                    {/* <motion.div
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.1 }}
@@ -293,12 +301,12 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
                         <h4 className="text-sm font-bold mb-1">Detailed Filtering</h4>
                         <p className="text-[11px] text-gray-400 leading-relaxed font-medium">Use multiple filters simultaneously to pinpoint specific transactions in your wallet history.</p>
                       </div>
-                    </motion.div>
+                    </motion.div> */}
 
                     {/* Section: Cash Flow Mode */}
                     <div className="space-y-5 pt-2">
                       <div className="flex items-center gap-3 px-2">
-                        <div className="w-11 h-11 rounded-2xl bg-[#FEF2F2] text-red-600 flex items-center justify-center border border-red-100 shadow-sm">
+                        <div className="w-11 h-11 rounded-2xl bg-lime-50 text-lime-600 flex items-center justify-center border border-lime-100 shadow-sm">
                           <RotateCcw size={22} strokeWidth={2.5} />
                         </div>
                         <div>
@@ -377,12 +385,32 @@ export default function WalletFilterModal({ isOpen, onClose, filterFields, onApp
                         })}
                       </div>
                     </div>
-
-
                   </div>
-
                 </div>
               </div>
+
+              {/* Mobile Actions - Sticky Bottom */}
+              <div className="md:hidden border-t border-gray-100 p-4 bg-white flex items-center gap-3 shrink-0">
+                {activeCount > 0 && (
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleReset}
+                    className="flex-1 py-3.5 rounded-3xl font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2 bg-gray-100 text-gray-500 shadow-gray-200/10 hover:bg-gray-200"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Reset
+                  </motion.button>
+                )}
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleApply}
+                  className="flex-[2] py-3.5 rounded-3xl font-bold text-base shadow-lg shadow-lime-500/30 transition-all flex items-center justify-center gap-2 bg-lime-500 text-white hover:bg-lime-600"
+                >
+                  <span>Apply Filters</span>
+                  <Check className="w-5 h-5" strokeWidth={3} />
+                </motion.button>
+              </div>
+
             </motion.div>
           </div>
         </>

@@ -8,6 +8,7 @@ import { Search, Plus, Settings, X, CheckCircle2 } from '@repo/ui/icons';
 import MobileDishDrawer from './MobileDishDrawer';
 import CategoryManagerModal from './CategoryManagerModal';
 import MobileDishCard from './MobileDishCard';
+import { useBottomNav } from '@/app/(protected)/(normal)/context/BottomNavContext';
 
 interface MobileMenuProps {
   dishes: Dish[];
@@ -41,6 +42,12 @@ export default function MobileMenu({
   const { confirm } = useSwipeConfirmation();
   const [activeCategoryId, setActiveCategoryId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   // Modal / Drawer States
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
@@ -50,6 +57,33 @@ export default function MobileMenu({
 
   // References for scrolling
   const mainScrollRef = useRef<HTMLDivElement>(null);
+  const { setIsVisible } = useBottomNav();
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const container = mainScrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const currentScrollY = container.scrollTop;
+      const diff = currentScrollY - lastScrollY.current;
+      lastScrollY.current = currentScrollY;
+
+      if (Math.abs(diff) < 3) return;
+
+      if (diff > 5 && currentScrollY > 20) {
+        setIsVisible(false);
+      } else if (diff < -5) {
+        setIsVisible(true);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      setIsVisible(true);
+    };
+  }, [setIsVisible]);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const tabsScrollRef = useRef<HTMLDivElement>(null);
   const tabButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -191,52 +225,101 @@ export default function MobileMenu({
       {/* Sticky Header & Categories Wrapper */}
       <div className="absolute top-0 left-0 right-0 z-30 bg-[#F7F7F7]/85 backdrop-blur-md pb-6 max-md:[mask-image:linear-gradient(to_bottom,black_88%,transparent)]">
         {/* Header - Styled like Mobile Orders header */}
-        <div className="px-3 pt-4 pb-4">
-          <div className="flex items-center justify-between mb-4 px-2">
-            <div>
-              <h1 className="text-2xl font-anton font-bold text-gray-900 uppercase tracking-tight leading-none">
-                MENU & STOCK
-              </h1>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowCategoryManager(true)}
-                className="w-10 h-10 rounded-2xl bg-gray-200/70 border-2 border-gray-200 flex items-center justify-center text-gray-400 shadow-md"
-                title="Categories Manager"
+        <div className="px-3 pt-4 pb-4 min-h-16 relative overflow-hidden">
+          <AnimatePresence mode="popLayout">
+            {isSearchOpen ? (
+              <motion.div
+                key="search-bar"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex items-center gap-2 w-full px-2"
               >
-                <Settings size={20} strokeWidth={2.8} />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={handleCreateDish}
-                className="w-10 h-10 rounded-2xl bg-primary/90 text-white flex items-center justify-center shadow-md shadow-[var(--primary)]/20"
-                title="Thêm món mới"
+                <div className="relative flex-1 group">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-lime-500 transition-colors pointer-events-none" />
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="Search dishes..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setSearchQuery(searchInput);
+                      }
+                    }}
+                    className="w-full pl-9 pr-9 py-2 bg-gray-200/70 border border-gray-250 rounded-2xl text-xs font-bold text-gray-900 outline-none focus:border-lime-500 focus:bg-white transition-all placeholder:text-gray-400 shadow-sm"
+                  />
+                  {searchInput && (
+                    <button
+                      onClick={() => {
+                        setSearchInput('');
+                        setSearchQuery('');
+                      }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-gray-300/60 text-gray-500 hover:bg-gray-400 hover:text-gray-700 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => {
+                    setIsSearchOpen(false);
+                    setSearchInput('');
+                    setSearchQuery('');
+                  }}
+                  className="text-xs font-bold text-gray-500 hover:text-gray-950 transition-colors px-2 py-2 shrink-0"
+                >
+                  Cancel
+                </button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="header-default"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="flex items-center justify-between w-full px-2"
               >
-                <Plus size={20} strokeWidth={3} />
-              </motion.button>
-            </div>
-          </div>
+                <div>
+                  <h1 className="text-2xl font-anton font-bold text-gray-900 uppercase tracking-tight leading-none">
+                    MENU & STOCK
+                  </h1>
+                </div>
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsSearchOpen(true)}
+                    className={`relative w-10 h-10 rounded-2xl border-2 flex items-center justify-center shadow-md transition-colors ${searchQuery
+                      ? 'bg-lime-500 border-lime-400 text-white shadow-lime-500/20'
+                      : 'bg-gray-200/70 border-gray-200 text-gray-400'
+                      }`}
+                    title="Search Options"
+                  >
+                    <Search size={20} strokeWidth={2.8} />
+                  </motion.button>
 
-          {/* Search Bar - Styled exactly like driver history search bar */}
-          <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--primary)] transition-colors pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search dishes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border-2 border-white focus:border-[var(--primary)]/20 rounded-3xl py-4 pl-14 pr-12 text-base font-bold font-anton text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-[var(--primary)]/5 transition-all shadow-[inset_0_0_20px_rgba(0,0,0,0.09)]"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-gray-200/50 hover:bg-gray-200 text-gray-500 hover:text-gray-700 flex items-center justify-center transition-all"
-              >
-                <X className="w-4 h-4" />
-              </button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowCategoryManager(true)}
+                    className="w-10 h-10 rounded-2xl bg-gray-200/70 border-2 border-gray-200 flex items-center justify-center text-gray-400 shadow-md"
+                    title="Categories Manager"
+                  >
+                    <Settings size={20} strokeWidth={2.8} />
+                  </motion.button>
+                  
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleCreateDish}
+                    className="w-10 h-10 rounded-2xl bg-primary/90 text-white flex items-center justify-center shadow-md shadow-[var(--primary)]/20"
+                    title="Thêm món mới"
+                  >
+                    <Plus size={20} strokeWidth={3} />
+                  </motion.button>
+                </div>
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
 
         {/* Category horizontal scrolling index selector tabs */}
@@ -270,7 +353,7 @@ export default function MobileMenu({
       {/* Main index scroll list - Renders all sections sequentially */}
       <div
         ref={mainScrollRef}
-        className="flex-1 p-4 pt-[208px] pb-24 space-y-10 overflow-y-auto no-scrollbar scroll-smooth"
+        className="flex-1 p-4 pt-[144px] pb-24 space-y-10 overflow-y-auto no-scrollbar scroll-smooth"
       >
         {categories.length === 0 ? (
           <div className="py-20 flex flex-col items-center justify-center text-gray-400 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">

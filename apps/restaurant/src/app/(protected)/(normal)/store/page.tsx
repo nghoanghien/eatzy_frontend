@@ -10,12 +10,14 @@ import StoreGeneralInfoEdit from '@/features/store/components/StoreGeneralInfoEd
 import StoreLocationEdit from '@/features/store/components/StoreLocationEdit';
 import StoreScheduleEdit from '@/features/store/components/StoreScheduleEdit';
 import StoreSkeleton from '@/features/store/components/StoreSkeleton';
+import MobileStore from '@/features/store/components/mobile/MobileStore';
 import { useMyStore, useUpdateStore } from '@/features/store/hooks';
 
 export default function StorePage() {
   const { hide } = useLoading();
 
   const [activeSection, setActiveSection] = useState<'general' | 'location' | 'schedule' | null>(null);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
   // Fetch store data
   const { store, isLoading } = useMyStore();
@@ -26,6 +28,15 @@ export default function StorePage() {
     hide();
   }, [hide]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleUpdateStore = async (updates: Record<string, any>) => {
     await updateStore(updates);
     setActiveSection(null);
@@ -33,6 +44,15 @@ export default function StorePage() {
 
   if (isLoading || !store) {
     return <StoreSkeleton />;
+  }
+
+  if (isMobile) {
+    return (
+      <MobileStore
+        store={store}
+        onUpdateStore={handleUpdateStore}
+      />
+    );
   }
 
   return (

@@ -1,0 +1,50 @@
+import { ImageWithFallback } from "@repo/ui";
+import { ShieldCheck } from "@repo/ui/icons";
+
+interface RestaurantProfileCardProps {
+  user: {
+    name: string;
+    email: string;
+    avatar?: string;
+  } | null;
+}
+
+export default function RestaurantProfileCard({ user }: RestaurantProfileCardProps) {
+  const displayName = user?.name || "Merchant Owner";
+  const displayEmail = user?.email || "owner.eatzy@gmail.com";
+  const avatarUrl = user?.avatar || "";
+
+  return (
+    <div className="bg-white rounded-[32px] p-3 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/50 flex items-center gap-5 relative overflow-hidden group">
+      {/* Abstract Background Accents */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-lime-500/5 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-lime-500/10 transition-all duration-700" />
+
+      {/* Avatar & Badge */}
+      <div className="relative shrink-0">
+        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-[#F7F7F7] shadow-xl relative transition-transform group-hover:scale-105 duration-500">
+          <ImageWithFallback
+            src={avatarUrl}
+            alt={displayName}
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-lime-500 text-white rounded-xl border-4 border-white flex items-center justify-center shadow-lg">
+          <ShieldCheck size={12} strokeWidth={3} />
+        </div>
+      </div>
+
+      {/* Name & Info */}
+      <div className="text-left relative z-10 min-w-0 flex-1">
+        <h2 className="text-xl font-anton font-bold text-[#1A1A1A] leading-tight mb-1 truncate uppercase tracking-tight">
+          {displayName}
+        </h2>
+        <div className="flex items-center gap-1.5 text-gray-400">
+          <span className="text-[13px] font-medium truncate opacity-80">
+            {displayEmail}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}

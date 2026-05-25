@@ -18,6 +18,7 @@ interface StoreScheduleEditProps {
   onSave: (updates: Partial<{ openingHours: DaySchedule[] }>) => Promise<void>;
   onClose: () => void;
   layoutId?: string;
+  isMobile?: boolean;
 }
 
 interface Shift {
@@ -39,7 +40,7 @@ const ZONES = [
   { label: 'EVENING', start: 18, end: 24 },
 ];
 
-export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: StoreScheduleEditProps) {
+export default function StoreScheduleEdit({ store, onSave, onClose, layoutId, isMobile = false }: StoreScheduleEditProps) {
   const [openingHours, setOpeningHours] = useState<DaySchedule[]>(() => {
     const data = JSON.parse(JSON.stringify(store.openingHours));
     data.forEach((day: DaySchedule) => {
@@ -61,6 +62,8 @@ export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: 
 
   const [conflictShifts, setConflictShifts] = useState<{ dayIndex: number, shiftIndex: number }[]>([]);
   const { confirm } = useSwipeConfirmation();
+
+
 
   // Store initial state for comparison
   const [initialJson] = useState(() => JSON.stringify(openingHours));
@@ -397,29 +400,41 @@ export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: 
   // Generate sparse markers
   const TIME_MARKERS = [0, 11, 14, 18, 23];
 
+  const animProps = isMobile ? {
+    initial: { y: "100%" },
+    animate: { y: 0 },
+    exit: { y: "100%" },
+    transition: { type: "spring", damping: 20, stiffness: 120 }
+  } : {};
+
   return (
     <motion.div
-      layoutId={layoutId}
-      className="bg-white w-[1200px] max-w-[95vw] rounded-[32px] pt-4 p-6 shadow-2xl relative overflow-hidden flex flex-col h-[90vh]"
+      layoutId={isMobile ? undefined : layoutId}
+      {...animProps}
+      className={
+        isMobile
+          ? "bg-white w-full rounded-t-[32px] pt-2 p-4 shadow-2xl overflow-hidden flex flex-col h-[90vh] max-h-[90vh] fixed bottom-0 left-0 right-0 z-[210]"
+          : "bg-white w-[1200px] max-w-[95vw] rounded-[32px] pt-4 p-6 shadow-2xl relative overflow-hidden flex flex-col h-[90vh]"
+      }
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-2 shrink-0 px-2 h-14">
+      <div className="flex items-center justify-between mb-2 shrink-0 px-0 h-14">
         <div className="flex items-center gap-6">
-          <h2 className="text-2xl font-anton font-bold text-[#1A1A1A] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center">
+          <h2 className="text-xl md:text-2xl font-anton font-bold text-[#1A1A1A] flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isMobile ? 'bg-[#1A1A1A] text-white' : 'bg-orange-50 text-orange-600'}`}>
               <Clock className="w-5 h-5" />
             </div>
-            WEEKLY SCHEDULE
+            {isMobile ? 'Weekly Schedule' : 'WEEKLY SCHEDULE'}
           </h2>
 
           {selectedShift && (
             <motion.div
               initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-2 bg-white border border-gray-100 p-1.5 pr-4 rounded-2xl shadow-lg ml-28 -mt-3"
+              className={`flex items-center gap-2 bg-white border border-gray-100 p-1.5 pr-4 rounded-2xl shadow-lg ${isMobile ? 'ml-4' : 'ml-28 -mt-3'}`}
             >
               {draftShift && (
                 <>
-                  <div className="bg-gray-50 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                  <div className={`px-3 py-1.5 rounded-xl flex items-center gap-2 ${isMobile ? 'bg-gray-200/60' : 'bg-gray-50'}`}>
                     <span className="text-xs font-bold text-gray-400 uppercase">From</span>
                     <TimeInput
                       value={draftShift.open}
@@ -438,7 +453,7 @@ export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: 
                     />
                   </div>
                   <span className="text-gray-300">-</span>
-                  <div className="bg-gray-50 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                  <div className={`px-3 py-1.5 rounded-xl flex items-center gap-2 ${isMobile ? 'bg-gray-200/60' : 'bg-gray-50'}`}>
                     <span className="text-xs font-bold text-gray-400 uppercase">To</span>
                     <TimeInput
                       value={draftShift.close}
@@ -478,7 +493,7 @@ export default function StoreScheduleEdit({ store, onSave, onClose, layoutId }: 
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3">
           <button
             onClick={handleGlobalSave}
             className="p-4 rounded-full font-bold bg-gray-100 text-gray-700 flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-all shadow-sm flex items-center gap-2"

@@ -77,17 +77,20 @@ const ReviewCard = ({ review }: { review: ReviewReportItemDTO }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg transition-all"
+      className={`
+        bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg transition-all
+        max-md:bg-gray-200/40 max-md:rounded-[24px] max-md:border-none max-md:p-4 max-md:space-y-2
+      `}
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-lime-100 flex items-center justify-center text-lime-700 font-bold text-sm">
+      <div className="flex items-start justify-between gap-4 mb-4 max-md:mb-1 max-md:gap-2">
+        <div className="flex items-center gap-3 max-md:gap-2.5">
+          <div className="w-10 h-10 rounded-full bg-lime-100 flex items-center justify-center text-lime-750 font-bold text-sm max-md:w-9 max-md:h-9 max-md:text-xs">
             {review.customerName.charAt(0)}
           </div>
           <div>
-            <h5 className="font-bold text-gray-900 text-sm">{review.customerName}</h5>
-            <p className="text-xs text-gray-400">
+            <h5 className="font-bold text-gray-900 text-sm max-md:text-sm max-md:font-bold max-md:text-[#1A1A1A] max-md:tracking-tight">{review.customerName}</h5>
+            <p className="text-xs text-gray-400 max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight">
               {new Date(review.createdAt).toLocaleDateString('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
@@ -96,21 +99,21 @@ const ReviewCard = ({ review }: { review: ReviewReportItemDTO }) => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-1 max-md:gap-0.5">
           <StarRating rating={review.rating} size="sm" />
-          <span className="text-xs font-medium text-gray-400">#{review.orderCode}</span>
+          <span className="text-xs font-medium text-gray-400 max-md:text-[11px] max-md:font-semibold max-md:text-gray-400">#{review.orderCode}</span>
         </div>
       </div>
 
       {/* Comment */}
-      <p className="text-sm text-gray-700 leading-relaxed mb-3">
+      <p className="text-sm text-gray-750 leading-relaxed mb-3 max-md:mb-1.5 max-md:text-[14px] max-md:font-medium max-md:text-[#1A1A1A] max-md:leading-relaxed max-md:tracking-tight">
         "{review.comment}"
       </p>
 
       {/* Dishes */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4 max-md:mb-2 max-md:gap-1.5">
         {review.dishNames.map((dish, i) => (
-          <span key={i} className="text-xs font-medium px-2.5 py-1 rounded-full bg-lime-50 text-lime-600">
+          <span key={i} className="text-xs font-medium px-2.5 py-1 rounded-full bg-lime-50 text-lime-600 max-md:text-[11px] max-md:font-semibold">
             {dish}
           </span>
         ))}
@@ -118,16 +121,24 @@ const ReviewCard = ({ review }: { review: ReviewReportItemDTO }) => {
 
       {/* Reply */}
       {review.reply ? (
-        <div className="bg-gray-50 rounded-xl p-4 border-l-4 border-lime-500">
-          <div className="flex items-center gap-2 mb-2">
-            <Reply className="w-4 h-4 text-lime-600" />
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Phản hồi của nhà hàng</span>
+        <div className="
+          bg-gray-50 rounded-xl p-4 border-l-4 border-lime-500
+          max-md:bg-white/80 max-md:rounded-[20px] max-md:p-3
+        ">
+          <div className="flex items-center gap-2 mb-2 max-md:mb-1">
+            <Reply className="w-4 h-4 text-lime-600 max-md:w-3.5 max-md:h-3.5" />
+            <span className="
+              text-xs font-bold text-gray-500 uppercase tracking-wider
+              max-md:text-[10px] max-md:font-bold max-md:text-[#1A1A1A] max-md:tracking-tight
+            ">
+              Phản hồi của nhà hàng
+            </span>
           </div>
-          <p className="text-sm text-gray-600">{review.reply}</p>
+          <p className="text-sm text-gray-600 max-md:text-[13px] max-md:font-medium max-md:leading-relaxed max-md:tracking-tight">{review.reply}</p>
         </div>
       ) : (
-        <button className="flex items-center gap-2 text-sm font-medium text-lime-600 hover:text-lime-700 transition-colors">
-          <Reply className="w-4 h-4" />
+        <button className="flex items-center gap-2 text-sm font-medium text-lime-600 hover:text-lime-700 transition-colors max-md:text-xs max-md:font-bold">
+          <Reply className="w-4 h-4 max-md:w-3.5 max-md:h-3.5" />
           Phản hồi đánh giá
         </button>
       )}
@@ -163,26 +174,61 @@ export default function ReviewsReport({ data }: ReviewsReportProps) {
       {/* Top Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Average Rating - Hero Card */}
-        <div className="sm:col-span-2 lg:col-span-1 bg-[#1A1A1A] p-6 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center min-h-[180px]">
-          <div className="mb-3">
+        <div className="
+          sm:col-span-2 lg:col-span-1 bg-[#1A1A1A] text-center text-white
+          md:p-6 md:rounded-2xl md:shadow-xl md:flex md:flex-col md:items-center md:justify-center md:min-h-[180px]
+          max-md:bg-[#1A1A1A] max-md:rounded-[32px] max-md:p-5 max-md:h-auto max-md:space-y-1.5 max-md:shadow-none max-md:flex max-md:flex-col max-md:items-center max-md:justify-center
+        ">
+          <div className="mb-3 max-md:mb-1">
             <StarRating rating={Math.round(averageRating)} size="lg" />
           </div>
-          <span className="text-5xl font-anton text-lime-400 mb-2">{averageRating.toFixed(1)}</span>
-          <p className="text-gray-400 text-sm font-medium">Điểm đánh giá trung bình</p>
-          <p className="text-gray-500 text-xs mt-1">{totalReviews} đánh giá</p>
+          <span className="
+            font-anton text-lime-400 block
+            md:text-5xl md:mb-2
+            max-md:text-2xl max-md:font-black max-md:tracking-tighter
+          ">
+            {averageRating.toFixed(1)}
+          </span>
+          <p className="
+            text-sm font-medium text-gray-400 block
+            max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight
+          ">
+            Điểm đánh giá trung bình
+          </p>
+          <p className="
+            text-xs text-gray-500 mt-1 block
+            max-md:mt-0 max-md:text-[11px] max-md:text-gray-500 max-md:font-medium
+          ">
+            {totalReviews} đánh giá
+          </p>
         </div>
 
         {/* Response Rate */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tỷ Lệ Phản Hồi</span>
-            <div className="p-2 rounded-xl bg-green-100">
+        <div className="
+          flex flex-col justify-between
+          md:p-6 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm md:bg-white
+          max-md:bg-gray-200/60 max-md:rounded-[32px] max-md:p-5 max-md:h-auto max-md:space-y-1.5 max-md:border-none max-md:shadow-none
+        ">
+          <div className="flex items-center justify-between mb-4 max-md:mb-1">
+            <span className="
+              text-xs font-bold text-gray-400 uppercase tracking-wider block
+              max-md:text-[10px] max-md:font-bold max-md:text-gray-505 max-md:uppercase max-md:tracking-widest max-md:mb-0.5
+            ">
+              Tỷ Lệ Phản Hồi
+            </span>
+            <div className="p-2 rounded-xl bg-green-150 max-md:hidden">
               <CheckCircle className="w-4 h-4 text-green-600" />
             </div>
           </div>
-          <div>
-            <span className="text-4xl font-anton text-green-600">{responseRate.toFixed(0)}%</span>
-            <div className="mt-3 h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="flex flex-col justify-end max-md:space-y-1">
+            <span className="
+              font-anton text-green-600 block
+              md:text-4xl
+              max-md:text-2xl max-md:font-black max-md:tracking-tighter
+            ">
+              {responseRate.toFixed(0)}%
+            </span>
+            <div className="mt-3 h-2 bg-gray-100 rounded-full overflow-hidden max-md:hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${responseRate}%` }}
@@ -194,31 +240,64 @@ export default function ReviewsReport({ data }: ReviewsReportProps) {
         </div>
 
         {/* Response Time */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Thời Gian Phản Hồi</span>
-            <div className="p-2 rounded-xl bg-blue-100">
+        <div className="
+          flex flex-col justify-between
+          md:p-6 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm md:bg-white
+          max-md:bg-gray-200/60 max-md:rounded-[32px] max-md:p-5 max-md:h-auto max-md:space-y-1.5 max-md:border-none max-md:shadow-none
+        ">
+          <div className="flex items-center justify-between mb-4 max-md:mb-1">
+            <span className="
+              text-xs font-bold text-gray-400 uppercase tracking-wider block
+              max-md:text-[10px] max-md:font-bold max-md:text-gray-505 max-md:uppercase max-md:tracking-widest max-md:mb-0.5
+            ">
+              Thời Gian Phản Hồi
+            </span>
+            <div className="p-2 rounded-xl bg-blue-150 max-md:hidden">
               <Clock className="w-4 h-4 text-blue-600" />
             </div>
           </div>
-          <div>
-            <span className="text-4xl font-anton text-blue-600">{averageResponseTime}</span>
-            <span className="text-lg text-gray-400 ml-1">phút</span>
-            <p className="text-xs text-gray-400 mt-2">Trung bình</p>
+          <div className="flex items-baseline gap-0.5 max-md:mt-0">
+            <span className="
+              font-anton text-blue-600 block
+              md:text-4xl
+              max-md:text-2xl max-md:font-black max-md:tracking-tighter
+            ">
+              {averageResponseTime}
+            </span>
+            <span className="
+              text-lg text-gray-400 ml-1 block
+              max-md:text-xs max-md:font-bold max-md:text-blue-600 max-md:ml-0.5
+            ">
+              phút
+            </span>
           </div>
         </div>
 
         {/* Positive vs Negative */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tích Cực / Tiêu Cực</span>
+        <div className="
+          md:p-6 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm md:bg-white
+          max-md:bg-gray-200/60 max-md:rounded-[32px] max-md:p-5 max-md:h-auto max-md:space-y-1.5 max-md:border-none max-md:shadow-none
+        ">
+          <div className="flex items-center justify-between mb-4 max-md:mb-1">
+            <span className="
+              text-xs font-bold text-gray-400 uppercase tracking-wider block
+              max-md:text-[10px] max-md:font-bold max-md:text-gray-505 max-md:uppercase max-md:tracking-widest max-md:mb-0.5
+            ">
+              Tích Cực / Tiêu Cực
+            </span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <ThumbsUp className="w-5 h-5 text-green-500" />
-              <span className="text-2xl font-anton text-green-600">{positiveCount}</span>
+          <div className="flex items-center gap-4 max-md:gap-2">
+            <div className="flex items-center gap-2 max-md:gap-1">
+              <ThumbsUp className="w-5 h-5 text-green-500 max-md:w-4.5 max-md:h-4.5" />
+              <span className="
+                font-anton text-green-600
+                md:text-2xl
+                max-md:text-xl max-md:font-black max-md:tracking-tighter
+              ">
+                {positiveCount}
+              </span>
             </div>
-            <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden flex">
+            <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden flex max-md:h-2">
               <div
                 className="h-full bg-lime-500"
                 style={{ width: `${positivePercent}%` }}
@@ -228,20 +307,38 @@ export default function ReviewsReport({ data }: ReviewsReportProps) {
                 style={{ width: `${100 - positivePercent}%` }}
               />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-anton text-red-500">{negativeCount}</span>
-              <ThumbsDown className="w-5 h-5 text-red-500" />
+            <div className="flex items-center gap-2 max-md:gap-1">
+              <span className="
+                font-anton text-red-500
+                md:text-2xl
+                max-md:text-xl max-md:font-black max-md:tracking-tighter
+              ">
+                {negativeCount}
+              </span>
+              <ThumbsDown className="w-5 h-5 text-red-500 max-md:w-4.5 max-md:h-4.5" />
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-3 text-center">
+          <p className="
+            text-xs text-gray-400 mt-3 text-center
+            max-md:mt-1 max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight
+          ">
             {positivePercent.toFixed(0)}% đánh giá tích cực (4-5 sao)
           </p>
         </div>
       </div>
 
       {/* Rating Distribution */}
-      <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm">
-        <h4 className="text-lg font-bold text-gray-900 mb-6">Phân Bố Đánh Giá</h4>
+      <div className="
+        bg-white shadow-sm
+        md:p-6 md:rounded-[32px] md:border md:border-gray-100
+        max-md:rounded-[32px] max-md:p-5 max-md:shadow-[0_4px_25px_rgba(0,0,0,0.03)] max-md:border max-md:border-gray-100/50
+      ">
+        <h4 className="
+          text-lg font-bold text-gray-900 mb-6
+          max-md:text-[16px] max-md:font-bold max-md:text-gray-500 max-md:tracking-tight
+        ">
+          Phân Bố Đánh Giá
+        </h4>
         <div className="space-y-4">
           <RatingBar stars={5} count={ratingDistribution.fiveStar} total={totalReviews} color="bg-lime-500" />
           <RatingBar stars={4} count={ratingDistribution.fourStar} total={totalReviews} color="bg-lime-400" />
@@ -252,22 +349,42 @@ export default function ReviewsReport({ data }: ReviewsReportProps) {
       </div>
 
       {/* Recent Reviews */}
-      <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm">
+      <div className="
+        bg-white shadow-sm
+        md:p-6 md:rounded-[32px] md:border md:border-gray-100
+        max-md:rounded-[32px] max-md:p-5 max-md:shadow-[0_4px_25px_rgba(0,0,0,0.03)] max-md:border max-md:border-gray-100/50
+      ">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="
+          flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6
+          max-md:mb-4 max-md:gap-3
+        ">
           <div>
-            <h4 className="text-xl font-bold text-gray-900 font-anton">Đánh Giá Gần Đây</h4>
-            <p className="text-sm text-gray-400 mt-1">{filteredReviews.length} đánh giá</p>
+            <h4 className="
+              text-xl font-bold text-gray-900 font-anton
+              max-md:text-lg max-md:font-bold max-md:text-[#1A1A1A] max-md:tracking-tight
+            ">
+              Đánh Giá Gần Đây
+            </h4>
+            <p className="
+              text-sm text-gray-400 mt-1
+              max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight max-md:mt-0.5
+            ">
+              {filteredReviews.length} đánh giá
+            </p>
           </div>
 
           {/* Filter */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setRatingFilter(null)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${ratingFilter === null
-                ? 'bg-[#1A1A1A] text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+              className={`
+                px-4 py-2 rounded-xl text-sm font-bold transition-all max-md:text-xs max-md:px-3 max-md:py-1.5
+                ${ratingFilter === null
+                  ? 'bg-[#1A1A1A] text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }
+              `}
             >
               Tất cả
             </button>
@@ -275,10 +392,13 @@ export default function ReviewsReport({ data }: ReviewsReportProps) {
               <button
                 key={star}
                 onClick={() => setRatingFilter(ratingFilter === star ? null : star)}
-                className={`px-3 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1 ${ratingFilter === star
-                  ? 'bg-lime-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                className={`
+                  px-3 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1 max-md:text-xs max-md:px-2.5 max-md:py-1.5
+                  ${ratingFilter === star
+                    ? 'bg-lime-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }
+                `}
               >
                 {star} <Star className="w-3 h-3" />
               </button>

@@ -13,6 +13,8 @@ import { useMobileBackHandler } from '@/hooks/useMobileBackHandler';
 import { useOrderDetail } from '@/features/history/hooks/useOrderDetail';
 import MobileHistoryDrawer from '@/features/history/components/mobile/MobileHistoryDrawer';
 
+import { useBottomNav } from '@/app/(protected)/(normal)/context/BottomNavContext';
+
 interface ReviewDisplayItem {
   id: number;
   authorName: string;
@@ -69,6 +71,41 @@ export default function MobileReviews({
   const router = useRouter();
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
+  const [searchInput, setSearchInput] = useState(searchQuery);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const { setIsVisible } = useBottomNav();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const currentScrollY = container.scrollTop;
+      const diff = currentScrollY - lastScrollY.current;
+      lastScrollY.current = currentScrollY;
+
+      if (Math.abs(diff) < 3) return;
+
+      if (diff > 5 && currentScrollY > 20) {
+        setIsVisible(false);
+      } else if (diff < -5) {
+        setIsVisible(true);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      setIsVisible(true);
+    };
+  }, [setIsVisible]);
+
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   // Hook and state to manage order details drawer loading
   const { order: selectedOrderDetails, fetchOrder, clearOrder } = useOrderDetail();
@@ -121,6 +158,7 @@ export default function MobileReviews({
     <div className="h-screen flex flex-col bg-[#F7F7F7] overflow-hidden md:hidden">
       {/* Main Content Area - Scrollable */}
       <PullToRefresh
+        ref={scrollContainerRef}
         onRefresh={async () => onRefresh()}
         className="flex-1 overflow-y-auto px-3 py-0 relative bg-[#F7F7F7] no-scrollbar"
         pullText="Pull to refresh reviews"
@@ -191,70 +229,119 @@ export default function MobileReviews({
             </div>
 
             <div className="space-y-4">
-              {/* Header row with sort dropdown */}
-              <div className="flex items-center justify-between pl-2">
-                <h2 className="text-sm font-bold text-gray-900">
-                  {reviews.length} reviews
-                </h2>
-
-                <div className="relative" ref={sortRef}>
-                  <button
-                    onClick={() => setIsSortOpen(!isSortOpen)}
-                    className="group flex items-center gap-2 px-4 py-2.5 bg-slate-50 border-2 border-white rounded-[20px] text-xs font-bold hover:border-[var(--primary)]/20 transition-all text-[#1A1A1A] min-w-[140px] justify-between shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] focus:ring-4 focus:ring-[var(--primary)]/5"
-                  >
-                    <div className="flex items-center gap-2">
-                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isSortOpen ? 'rotate-180 text-[var(--primary)]' : ''}`} />
-                      <div className="w-px h-3 bg-gray-200" />
-                      <span className="tracking-tight">{sortOptions.find(o => o.value === sortBy)?.label}</span>
-                    </div>
-                  </button>
-
-                  <AnimatePresence>
-                    {isSortOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="absolute right-0 top-[calc(100%+8px)] w-40 bg-white/90 backdrop-blur-xl rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-gray-100 z-50 overflow-hidden py-2"
-                      >
-                        {sortOptions.map(option => (
+              {/* Header row with search and sort dropdown */}
+              <div className="flex items-center justify-between pl-2 min-h-12 relative overflow-hidden">
+                <AnimatePresence mode="popLayout">
+                  {isSearchOpen ? (
+                    <motion.div
+                      key="search-bar"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-2 w-full pr-1"
+                    >
+                      <div className="relative flex-1 group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-lime-500 transition-colors pointer-events-none" />
+                        <input
+                          type="text"
+                          autoFocus
+                          placeholder="Search reviews..."
+                          value={searchInput}
+                          onChange={(e) => setSearchInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              setSearchQuery(searchInput);
+                            }
+                          }}
+                          className="w-full pl-9 pr-9 py-2 bg-gray-200/70 border border-gray-250 rounded-2xl text-xs font-bold text-gray-900 outline-none focus:border-lime-500 focus:bg-white transition-all placeholder:text-gray-400 shadow-sm"
+                        />
+                        {searchInput && (
                           <button
-                            key={option.value}
-                            onClick={() => { setSortBy(option.value); setIsSortOpen(false); }}
-                            className={`w-full text-left px-5 py-3.5 text-sm font-bold transition-all ${sortBy === option.value
-                              ? 'bg-gray-50 text-black'
-                              : 'text-gray-600 hover:bg-gray-50'
-                              }`}
+                            onClick={() => {
+                              setSearchInput('');
+                              setSearchQuery('');
+                            }}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-gray-300/60 text-gray-500 hover:bg-gray-400 hover:text-gray-700 transition-colors"
                           >
-                            {option.label}
+                            <X className="w-3 h-3" />
                           </button>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          setSearchInput('');
+                          setSearchQuery('');
+                        }}
+                        className="text-xs font-bold text-gray-500 hover:text-gray-950 transition-colors px-2 py-2"
+                      >
+                        Cancel
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="sort-and-count"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="flex items-center justify-between w-full"
+                    >
+                      <h2 className="text-sm font-bold text-gray-900">
+                        {reviews.length} reviews
+                      </h2>
 
-              {/* Search Bar - Matches customer app detail reviews style focus effects */}
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
-                  <Search className="w-5 h-5 text-gray-400 group-focus-within:text-[var(--primary)] transition-colors" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search reviews by content..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-white focus:border-[var(--primary)]/20 rounded-3xl py-4 pl-14 pr-12 text-lg font-bold font-anton text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-[var(--primary)]/5 transition-all shadow-[inset_0_0_20px_rgba(0,0,0,0.05)]"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-all group/close"
-                  >
-                    <X className="w-4 h-4 text-gray-600 group-hover/close:rotate-90 transition-transform duration-300" />
-                  </button>
-                )}
+                      <div className="flex items-center gap-2">
+                        {/* Search trigger button */}
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setIsSearchOpen(true)}
+                          className={`w-10 h-10 rounded-[17px] border-2 flex items-center justify-center transition-all ${searchQuery
+                            ? 'bg-lime-500 border-lime-400 text-white shadow-md shadow-lime-500/20'
+                            : 'bg-slate-50 border-white text-gray-600 shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] hover:border-[var(--primary)]/20'
+                            }`}
+                          title="Search reviews"
+                        >
+                          <Search size={16} strokeWidth={2.8} />
+                        </motion.button>
+
+                        <div className="relative shrink-0" ref={sortRef}>
+                          <button
+                            onClick={() => setIsSortOpen(!isSortOpen)}
+                            className="group flex items-center gap-2 px-4 py-2.5 bg-slate-50 border-2 border-white rounded-[20px] text-xs font-bold hover:border-[var(--primary)]/20 transition-all text-[#1A1A1A] min-w-[140px] justify-between shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] focus:ring-4 focus:ring-[var(--primary)]/5"
+                          >
+                            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isSortOpen ? 'rotate-180 text-[var(--primary)]' : ''}`} />
+                            <div className="w-px h-3 bg-gray-200" />
+                            <span className="tracking-tight">{sortOptions.find(o => o.value === sortBy)?.label}</span>
+                          </button>
+
+                          <AnimatePresence>
+                            {isSortOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                className="absolute right-0 top-[calc(100%+8px)] w-40 bg-white/90 backdrop-blur-xl rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-gray-100 z-50 overflow-hidden py-2"
+                              >
+                                {sortOptions.map(option => (
+                                  <button
+                                    key={option.value}
+                                    onClick={() => { setSortBy(option.value); setIsSortOpen(false); }}
+                                    className={`w-full text-left px-5 py-3.5 text-sm font-bold transition-all ${sortBy === option.value
+                                      ? 'bg-gray-50 text-black'
+                                      : 'text-gray-600 hover:bg-gray-50'
+                                      }`}
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Shimmer loading, empty states, or reviews list */}

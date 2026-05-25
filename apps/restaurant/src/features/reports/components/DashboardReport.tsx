@@ -60,34 +60,66 @@ const KPICard = ({
   colorClass = "text-lime-600",
   bgClass = "bg-white",
   isHero = false,
-}: any) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    whileHover={{ y: -2 }}
-    className={`p-6 rounded-2xl border border-gray-100 ${bgClass} flex flex-col justify-between h-[160px] relative overflow-hidden group transition-all shadow-sm hover:shadow-lg`}
-  >
-    <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${colorClass}`}>
-      <Icon className="w-16 h-16" />
-    </div>
+}: any) => {
+  const isVnd = typeof value === 'string' && (value.includes('₫') || value.includes('đ') || value.includes('VND'));
+  const displayValue = isVnd ? value.replace(/[₫đVND]/g, '').trim() : value;
 
-    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider z-10">{title}</span>
-
-    <div className="z-10">
-      <span className={`text-3xl font-anton block mb-1 ${isHero ? 'text-lime-400' : 'text-gray-900'}`}>
-        {value}
-      </span>
-      <div className="flex items-center gap-1.5">
-        {trend && (
-          <span className="bg-lime-50 text-lime-600 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
-            <ArrowUpRight className="w-2.5 h-2.5" /> {trend}
-          </span>
-        )}
-        <span className="text-xs font-medium text-gray-500">{subtext}</span>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
+      className={`
+        relative overflow-hidden transition-all group
+        md:p-6 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm md:hover:shadow-lg md:h-[160px] md:flex md:flex-col md:justify-between ${bgClass}
+        max-md:bg-gray-200/60 max-md:rounded-[32px] max-md:p-5 max-md:h-auto max-md:space-y-1.5 max-md:border-none max-md:shadow-none
+      `}
+    >
+      <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${colorClass} max-md:hidden`}>
+        <Icon className="w-16 h-16" />
       </div>
-    </div>
-  </motion.div>
-);
+
+      <span className="
+        text-xs font-bold text-gray-400 uppercase tracking-wider z-10 block
+        max-md:text-[10px] max-md:font-bold max-md:text-gray-500 max-md:uppercase max-md:tracking-widest max-md:mb-0.5
+      ">
+        {title}
+      </span>
+
+      <div className="z-10 flex flex-col justify-end max-md:space-y-1">
+        <div className="flex items-baseline gap-0.5">
+          <span className={`
+            font-anton block
+            md:text-3xl md:mb-1 ${isHero ? 'text-lime-400' : 'text-[#1A1A1A] md:text-gray-900'}
+            max-md:text-2xl max-md:font-black max-md:tracking-tighter
+          `}>
+            {displayValue}
+          </span>
+          {isVnd && (
+            <span className="
+              hidden max-md:inline text-xs font-bold text-[#1A1A1A]
+            ">
+              đ
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {trend && (
+            <span className="bg-lime-50 text-lime-600 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
+              <ArrowUpRight className="w-2.5 h-2.5" /> {trend}
+            </span>
+          )}
+          <span className="
+            text-xs font-medium text-gray-500
+            max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight
+          ">
+            {subtext}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 export default function DashboardReport({ data }: DashboardReportProps) {
   if (!data) return null;
@@ -138,33 +170,73 @@ export default function DashboardReport({ data }: DashboardReportProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 rounded-2xl bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A] text-white border-none shadow-xl flex flex-col justify-between h-[160px] relative overflow-hidden"
+          className={`
+            relative overflow-hidden text-white border-none
+            md:p-6 md:rounded-2xl md:bg-gradient-to-br md:from-[#1A1A1A] md:to-[#2A2A2A] md:shadow-xl md:h-[160px] md:flex md:flex-col md:justify-between
+            max-md:bg-[#1A1A1A] max-md:rounded-[32px] max-md:p-5 max-md:h-auto max-md:space-y-1.5 max-md:shadow-none
+          `}
         >
-          <div className="absolute top-0 right-0 p-4 opacity-10">
+          <div className="absolute top-0 right-0 p-4 opacity-10 max-md:hidden">
             <Star className="w-16 h-16 text-lime-400" />
           </div>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Đánh Giá TB</span>
-          <div>
-            <span className="text-3xl font-anton text-lime-400">{data.averageRating.toFixed(1)}</span>
-            <p className="text-xs text-gray-400 mt-1">{data.totalReviews} đánh giá</p>
+          <span className="
+            text-xs font-bold text-gray-400 uppercase tracking-wider block
+            max-md:text-[10px] max-md:font-bold max-md:text-gray-400 max-md:uppercase max-md:tracking-widest max-md:mb-0.5
+          ">
+            Đánh Giá TB
+          </span>
+          <div className="flex flex-col justify-end max-md:space-y-1">
+            <span className="
+              font-anton text-lime-400 block
+              md:text-3xl
+              max-md:text-2xl max-md:font-black max-md:tracking-tighter
+            ">
+              {data.averageRating.toFixed(1)}
+            </span>
+            <p className="
+              text-xs text-gray-400 mt-1
+              max-md:mt-0 max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight
+            ">
+              {data.totalReviews} đánh giá
+            </p>
           </div>
         </motion.div>
       </div>
 
       {/* Top Performer Highlight */}
-      <div className="bg-lime-50 rounded-[32px] border border-lime-200 p-8 flex items-center gap-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-8 opacity-5">
+      <div className="
+        relative overflow-hidden flex flex-col sm:flex-row items-center gap-4 md:gap-6
+        md:bg-lime-50 md:rounded-[32px] md:border md:border-lime-200 md:p-8
+        max-md:bg-lime-500/10 max-md:rounded-[32px] max-md:p-5 max-md:border max-md:border-lime-500/20 max-md:shadow-none
+      ">
+        <div className="absolute top-0 right-0 p-8 opacity-5 max-md:hidden">
           <Crown className="w-64 h-64 text-lime-900" />
         </div>
-        <div className="w-16 h-16 rounded-2xl bg-lime-100 flex items-center justify-center text-lime-600 shrink-0 z-10">
-          <Crown className="w-8 h-8" />
+        <div className="
+          w-16 h-16 rounded-2xl bg-lime-100 flex items-center justify-center text-lime-600 shrink-0 z-10
+          max-md:w-8 max-md:h-8 max-md:rounded-xl max-md:bg-lime-500 max-md:text-white max-md:shadow-sm
+        ">
+          <Crown className="w-8 h-8 max-md:w-4 max-md:h-4" />
         </div>
-        <div className="z-10">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded-full bg-lime-200 text-lime-800 text-[10px] font-bold uppercase tracking-wide">Best Seller</span>
+        <div className="z-10 text-center sm:text-left max-md:text-left max-md:w-full">
+          <div className="flex items-center justify-center sm:justify-start gap-2 mb-1 max-md:justify-start">
+            <span className="
+              px-2 py-0.5 rounded-full bg-lime-200 text-lime-800 text-[10px] font-bold uppercase tracking-wide
+              max-md:bg-transparent max-md:text-lime-700 max-md:text-[10px] max-md:font-bold max-md:uppercase max-md:tracking-widest max-md:px-0 max-md:py-0
+            ">
+              Best Seller
+            </span>
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-1">{data.topPerformingDish}</h3>
-          <p className="text-sm text-gray-600 font-medium max-w-xl">
+          <h3 className="
+            text-2xl font-bold text-gray-900 mb-1
+            max-md:text-lg max-md:font-bold max-md:text-[#1A1A1A] max-md:tracking-tight max-md:mt-1
+          ">
+            {data.topPerformingDish}
+          </h3>
+          <p className="
+            text-sm text-gray-600 font-medium max-w-xl
+            max-md:text-[14px] max-md:font-medium max-md:text-gray-500 max-md:leading-relaxed max-md:tracking-tight max-md:mt-1
+          ">
             Món ăn bán chạy nhất trong tháng này, chiếm tỷ lệ cao nhất trong tổng doanh thu của nhà hàng.
           </p>
         </div>
@@ -173,8 +245,17 @@ export default function DashboardReport({ data }: DashboardReportProps) {
       {/* Chart + Order Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm h-[400px]">
-          <h4 className="text-lg font-bold text-gray-900 mb-6">Xu Hướng Doanh Thu</h4>
+        <div className="
+          lg:col-span-2 bg-white shadow-sm h-[280px] sm:h-[400px]
+          md:p-6 md:rounded-[32px] md:border md:border-gray-100
+          max-md:rounded-[32px] max-md:p-5 max-md:shadow-[0_4px_25px_rgba(0,0,0,0.03)] max-md:border max-md:border-gray-100/50
+        ">
+          <h4 className="
+            text-lg font-bold text-gray-900 mb-6
+            max-md:text-[16px] max-md:font-bold max-md:text-gray-500 max-md:tracking-tight
+          ">
+            Xu Hướng Doanh Thu
+          </h4>
           <ResponsiveContainer width="100%" height="85%">
             <AreaChart data={formattedChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
@@ -194,34 +275,75 @@ export default function DashboardReport({ data }: DashboardReportProps) {
         </div>
 
         {/* Order Status Card */}
-        <div className="bg-white rounded-[32px] border border-gray-100 p-6 shadow-sm">
-          <h4 className="text-lg font-bold text-gray-900 mb-6">Tình Trạng Đơn Hàng</h4>
+        <div className="
+          bg-white shadow-sm
+          md:p-6 md:rounded-[32px] md:border md:border-gray-100
+          max-md:rounded-[32px] max-md:p-5 max-md:shadow-[0_4px_25px_rgba(0,0,0,0.03)] max-md:border max-md:border-gray-100/50
+        ">
+          <h4 className="
+            text-lg font-bold text-gray-900 mb-6
+            max-md:text-[16px] max-md:font-bold max-md:text-gray-500 max-md:tracking-tight
+          ">
+            Tình Trạng Đơn Hàng
+          </h4>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                <div className="
+                  w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center
+                  max-md:bg-slate-50 max-md:border max-md:border-gray-100
+                ">
+                  <CheckCircle className="w-5 h-5 text-green-600 max-md:w-4.5 max-md:h-4.5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-900">Hoàn thành</p>
-                  <p className="text-xs text-gray-500">{data.completedOrders} đơn</p>
+                  <p className="
+                    text-sm font-bold text-gray-900
+                    max-md:text-sm max-md:font-bold max-md:text-[#1A1A1A] max-md:tracking-tight
+                  ">
+                    Hoàn thành
+                  </p>
+                  <p className="
+                    text-xs text-gray-500
+                    max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight
+                  ">
+                    {data.completedOrders} đơn
+                  </p>
                 </div>
               </div>
-              <span className="text-lg font-anton text-green-600">
+              <span className="
+                text-lg font-anton text-green-600
+                max-md:text-lg max-md:font-black max-md:text-green-650 max-md:tracking-tighter
+              ">
                 {(100 - data.cancelRate).toFixed(1)}%
               </span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                  <XCircle className="w-5 h-5 text-red-600" />
+                <div className="
+                  w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center
+                  max-md:bg-slate-50 max-md:border max-md:border-gray-100
+                ">
+                  <XCircle className="w-5 h-5 text-red-600 max-md:w-4.5 max-md:h-4.5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-900">Đã hủy</p>
-                  <p className="text-xs text-gray-500">{data.cancelledOrders} đơn</p>
+                  <p className="
+                    text-sm font-bold text-gray-900
+                    max-md:text-sm max-md:font-bold max-md:text-[#1A1A1A] max-md:tracking-tight
+                  ">
+                    Đã hủy
+                  </p>
+                  <p className="
+                    text-xs text-gray-500
+                    max-md:text-xs max-md:text-gray-400 max-md:font-medium max-md:tracking-tight
+                  ">
+                    {data.cancelledOrders} đơn
+                  </p>
                 </div>
               </div>
-              <span className="text-lg font-anton text-red-600">
+              <span className="
+                text-lg font-anton text-red-600
+                max-md:text-lg max-md:font-black max-md:text-red-650 max-md:tracking-tighter
+              ">
                 {data.cancelRate.toFixed(1)}%
               </span>
             </div>
@@ -242,14 +364,46 @@ export default function DashboardReport({ data }: DashboardReportProps) {
           </div>
 
           {/* Quick Stats */}
-          <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-2 gap-4">
+          <div className="
+            mt-6 pt-6 border-t border-gray-100 grid grid-cols-2 gap-4
+            max-md:mt-4 max-md:pt-4 max-md:border-t max-md:border-gray-150
+          ">
             <div className="text-center">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Giá trị TB</p>
-              <p className="text-lg font-anton text-gray-900">{formatCompact(data.averageOrderValue)}</p>
+              <p className="
+                text-xs font-bold text-gray-400 uppercase tracking-wider mb-1
+                max-md:text-[10px] max-md:font-bold max-md:text-gray-400 max-md:uppercase max-md:tracking-widest max-md:mb-0.5
+              ">
+                Giá trị TB
+              </p>
+              <div className="flex items-baseline justify-center gap-0.5">
+                <span className="
+                  text-lg font-anton text-gray-900
+                  max-md:text-xl max-md:font-black max-md:text-[#1A1A1A] max-md:tracking-tighter
+                ">
+                  {formatCompact(data.averageOrderValue).replace("đ", "").replace("₫", "").trim()}
+                </span>
+                {formatCompact(data.averageOrderValue).includes('đ') && (
+                  <span className="
+                    hidden max-md:inline text-xs font-bold text-[#1A1A1A]
+                  ">
+                    đ
+                  </span>
+                )}
+              </div>
             </div>
             <div className="text-center">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Đánh giá</p>
-              <p className="text-lg font-anton text-gray-900">{data.totalReviews}</p>
+              <p className="
+                text-xs font-bold text-gray-400 uppercase tracking-wider mb-1
+                max-md:text-[10px] max-md:font-bold max-md:text-gray-400 max-md:uppercase max-md:tracking-widest max-md:mb-0.5
+              ">
+                Đánh giá
+              </p>
+              <p className="
+                text-lg font-anton text-gray-900
+                max-md:text-xl max-md:font-black max-md:text-[#1A1A1A] max-md:tracking-tighter
+              ">
+                {data.totalReviews}
+              </p>
             </div>
           </div>
         </div>
