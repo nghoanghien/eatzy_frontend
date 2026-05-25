@@ -28,9 +28,9 @@ export default function MobileMenuShimmer() {
 
   return (
     <div className="h-screen flex flex-col bg-[#F8F9FA] overflow-hidden md:hidden">
-      {/* Real static Header & Search bar */}
-      <div className="px-3 pt-4 pb-4 shrink-0 bg-white">
-        <div className="flex items-center justify-between mb-4 px-2">
+      {/* Real static Header */}
+      <div className="px-3 pt-4 pb-3 shrink-0 bg-white">
+        <div className="flex items-center justify-between px-2">
           <div>
             <h1 className="text-2xl font-anton font-bold text-gray-900 uppercase tracking-tight leading-none">
               MENU & STOCK
@@ -50,17 +50,6 @@ export default function MobileMenuShimmer() {
               <Plus size={20} strokeWidth={3} />
             </button>
           </div>
-        </div>
-
-        {/* Search Bar - Styled exactly like driver history search bar */}
-        <div className="relative group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search dishes..."
-            readOnly
-            className="w-full bg-slate-50 border-2 border-white rounded-3xl py-4 pl-14 pr-12 text-base font-bold font-anton text-gray-900 placeholder:text-gray-300 focus:outline-none pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.09)]"
-          />
         </div>
       </div>
 

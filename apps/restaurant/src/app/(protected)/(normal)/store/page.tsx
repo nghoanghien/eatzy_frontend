@@ -17,7 +17,8 @@ export default function StorePage() {
   const { hide } = useLoading();
 
   const [activeSection, setActiveSection] = useState<'general' | 'location' | 'schedule' | null>(null);
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // Fetch store data
   const { store, isLoading } = useMyStore();
@@ -29,6 +30,7 @@ export default function StorePage() {
   }, [hide]);
 
   useEffect(() => {
+    setMounted(true);
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -42,7 +44,7 @@ export default function StorePage() {
     setActiveSection(null);
   };
 
-  if (isLoading || !store) {
+  if (!mounted || isLoading || !store) {
     return <StoreSkeleton />;
   }
 
